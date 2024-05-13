@@ -1,34 +1,45 @@
 <script setup>
-import { ref, computed } from 'vue';
-import TravelDetail from '@/components/TravelDetail.vue'
+import { ref, onMounted } from 'vue';
+import axios from "axios";
 
-const emit = defineEmits(['openDetail'])
+const { VITE_OPEN_API_SERVICE_KEY } = import.meta.env
+const { VITE_SEARCH_TRIP_URL } = import.meta.env
 
-const loading = ref(true);
+const tripStation = ref([])
 
-const open = ref(false)
+onMounted(() => {
+    getTripStation()
+})
 
-const openDetail = () => {
-    emit('openDetail')
-    open.value = !open.value
+const getTripStation = () => {
+    axios.get(VITE_SEARCH_TRIP_URL, {
+        params: {
+            serviceKey: VITE_OPEN_API_SERVICE_KEY,
+            numOfRows: 10,
+            pageNo: 1,
+            MobileOS: "ETC",
+            MobileApp: "AppTest",
+            _type: "json",
+            keyword: "해운대",
+        },
+    })
+        .then(({ data }) => {
+            console.log(data)
+            tripStation.value = data.items[0].item
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 }
 
 </script>
 <template>
     <a-space :size="10">
-        <a-card hoverable style=" width: 300" @click="openDetail">
+        <a-card hoverable style=" width: 300">
             <template #cover>
-                <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
-            </template>
-            <template #actions>
-                <setting-outlined key="setting" />
-                <edit-outlined key="edit" />
-                <ellipsis-outlined key="ellipsis" />
+                <!-- <img alt="example" src= /> -->
             </template>
             <a-card-meta title="Card title" description="This is the description">
-                <template #avatar>
-                    <a-avatar src="https://joeschmoe.io/api/v1/random" />
-                </template>
             </a-card-meta>
         </a-card>
         <!-- <TravelDetail v-if="open" /> -->

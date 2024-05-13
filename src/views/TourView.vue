@@ -5,7 +5,7 @@ import TourItem from '@/components/TourItem.vue'
 import TourItemLoading from '@/components/TourItemLoading.vue'
 import TravelDetail from '@/components/TravelDetail.vue'
 
-
+const activeKey = ref('1');
 const placement = ref('left');
 const open = ref(false);
 const showDrawer = () => {
@@ -48,27 +48,55 @@ const openDetail = () => {
 
     <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
         @close="onClose" :mask="false">
-        <template #extra>
-            <a-button type="text" style="margin-right: 0px" @click="onClose">
-                <template #icon>
-                    <DoubleLeftOutlined />
+        <a-tabs v-model:activeKey="activeKey">
+            <a-tab-pane key="1" tab="내 여행 기록">
+                <template #extra>
+                    <a-button type="text" style="margin-right: 0px" @click="onClose">
+                        <template #icon>
+                            <DoubleLeftOutlined />
+                        </template>
+                    </a-button>
                 </template>
-            </a-button>
-        </template>
-        <a-switch :checked="!loading" @change="onChange" />
-        <template v-if="loading">
-            <TourItemLoading />
-        </template>
-        <template v-else>
-            <a-space direction="horizontal" :size="30">
-                <a-space direction="vertical" :size="12">
-                    <TourItem @open-detail="openDetail" />
-                    <TourItem @open-detail="openDetail" />
-                    <TourItem @open-detail="openDetail" />
-                </a-space>
-                <TravelDetail v-show="detailOpen" />
-            </a-space>
-        </template>
+                <a-switch :checked="!loading" @change="onChange" />
+                <template v-if="loading">
+                    <TourItemLoading />
+                </template>
+                <template v-else>
+                    <a-space direction="horizontal" :size="30">
+                        <a-space direction="vertical" :size="12">
+                            <TourItem @open-detail="openDetail" />
+                            <TourItem @open-detail="openDetail" />
+                            <TourItem @open-detail="openDetail" />
+                        </a-space>
+                        <TravelDetail v-show="detailOpen" />
+                    </a-space>
+                </template>
+            </a-tab-pane>
+            <a-tab-pane key="2" tab="관광지 정보">
+                <template #extra>
+                    <a-button type="text" style="margin-right: 0px" @click="onClose">
+                        <template #icon>
+                            <DoubleLeftOutlined />
+                        </template>
+                    </a-button>
+                </template>
+                <a-switch :checked="!loading" @change="onChange" />
+                <template v-if="loading">
+                    <TourItemLoading />
+                </template>
+                <template v-else>
+                    <a-space direction="horizontal" :size="30">
+                        <a-space direction="vertical" :size="12">
+                            <TourItem @open-detail="openDetail" />
+                            <TourItem @open-detail="openDetail" />
+                            <TourItem @open-detail="openDetail" />
+                        </a-space>
+                        <TravelDetail v-show="detailOpen" />
+                    </a-space>
+                </template>
+            </a-tab-pane>
+            <a-tab-pane key="3" tab="Tab 3">Content of Tab Pane 3</a-tab-pane>
+        </a-tabs>
     </a-drawer>
 </template>
 
