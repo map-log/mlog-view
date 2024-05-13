@@ -50,7 +50,7 @@ const openDetail = () => {
         @close="onClose" :mask="false">
         <a-tabs v-model:activeKey="activeKey">
             <a-tab-pane key="1" tab="내 여행 기록">
-                <template #extra>
+                <!-- <template #extra>
                     <a-button type="text" style="margin-right: 0px" @click="onClose">
                         <template #icon>
                             <DoubleLeftOutlined />
@@ -70,30 +70,14 @@ const openDetail = () => {
                         </a-space>
                         <TravelDetail v-show="detailOpen" />
                     </a-space>
-                </template>
+                </template> -->
             </a-tab-pane>
             <a-tab-pane key="2" tab="관광지 정보">
-                <template #extra>
-                    <a-button type="text" style="margin-right: 0px" @click="onClose">
-                        <template #icon>
-                            <DoubleLeftOutlined />
-                        </template>
-                    </a-button>
-                </template>
-                <a-switch :checked="!loading" @change="onChange" />
-                <template v-if="loading">
-                    <TourItemLoading />
-                </template>
-                <template v-else>
-                    <a-space direction="horizontal" :size="30">
-                        <a-space direction="vertical" :size="12">
-                            <TourItem @open-detail="openDetail" />
-                            <TourItem @open-detail="openDetail" />
-                            <TourItem @open-detail="openDetail" />
-                        </a-space>
-                        <TravelDetail v-show="detailOpen" />
+                <a-space direction="horizontal" :size="30">
+                    <a-space direction="vertical" :size="12">
+                        <TourItem />
                     </a-space>
-                </template>
+                </a-space>
             </a-tab-pane>
             <a-tab-pane key="3" tab="Tab 3">Content of Tab Pane 3</a-tab-pane>
         </a-tabs>

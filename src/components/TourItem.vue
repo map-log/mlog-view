@@ -1,47 +1,71 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import axios from "axios";
 
-const { VITE_OPEN_API_SERVICE_KEY } = import.meta.env
-const { VITE_SEARCH_TRIP_URL } = import.meta.env
+const { VITE_OPEN_API_SERVICE_KEY, VITE_SEARCH_TRIP_URL } = import.meta.env;
 
-const tripStation = ref([])
-
-onMounted(() => {
-    getTripStation()
+const params = ref({
+    serviceKey: VITE_OPEN_API_SERVICE_KEY,
+    numOfRows: 10,
+    pageNo: 1,
+    MobileOS: "ETC",
+    MobileApp: "AppTest",
+    _type: "json",
+    keyword: "",
 })
 
-const getTripStation = () => {
-    axios.get(VITE_SEARCH_TRIP_URL, {
-        params: {
-            serviceKey: VITE_OPEN_API_SERVICE_KEY,
-            numOfRows: 10,
-            pageNo: 1,
-            MobileOS: "ETC",
-            MobileApp: "AppTest",
-            _type: "json",
-            keyword: "해운대",
-        },
-    })
+const tripStation = ref([]);
+
+// 키워드에 따른 데이터 조회, debounce로 호출 지연
+const searchAttraction = () => {
+    axios
+        .get(VITE_SEARCH_TRIP_URL, { params: params.value })
         .then(({ data }) => {
-            console.log(data)
-            tripStation.value = data.items[0].item
-        })
-        .catch((err) => {
-            console.log(err)
+            console.log(params.value.keyword)
+            tripStation.value = data.response.body.items.item
         })
 }
 
 </script>
+
 <template>
-    <a-space :size="10">
-        <a-card hoverable style=" width: 300">
-            <template #cover>
-                <!-- <img alt="example" src= /> -->
-            </template>
-            <a-card-meta title="Card title" description="This is the description">
-            </a-card-meta>
+    <a-space direction="vertical" :size="12">
+      <a-space direction="horizontal" :size="12">
+        <input type="text" v-model="params.keyword" class="search-input" placeholder="키워드를 입력하세요" />
+        <a-button type="primary" @click="searchAttraction">검색</a-button>
+      </a-space>
+      <a-space direction="vertical" :size="10" style="width: 100%">
+        <a-card v-for="station in tripStation" :key="station.contentid" hoverable style="width: 300px; margin-bottom: 12px;">
+          <template #cover>
+            <img :alt="station.title" :src="station.firstimage" style="width: 100%" />
+          </template>
+          <a-card-meta :title="station.title" :description="station.addr1 + ' ' + station.addr2"></a-card-meta>
         </a-card>
-        <!-- <TravelDetail v-if="open" /> -->
+      </a-space>
     </a-space>
-</template>
+  </template>
+  
+  <style>
+  .search-input {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .search-input:focus {
+    border-color: #007bff;
+  }
+  
+  /* 추가한 스타일 */
+  a-space.horizontal {
+    display: flex;
+    align-items: center;
+  }
+  
+  a-button[type="primary"] {
+    margin-left: 10px;
+  }
+  </style>
