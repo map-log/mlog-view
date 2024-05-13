@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
-import { AlignCenterOutlined } from '@ant-design/icons-vue'
+import { ref, computed } from 'vue';
+import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue'
 import TourItem from '@/components/TourItem.vue'
 import TourItemLoading from '@/components/TourItemLoading.vue'
+import TravelDetail from '@/components/TravelDetail.vue'
 
 
 const placement = ref('left');
@@ -19,14 +20,18 @@ const onChange = checked => {
     loading.value = !checked;
 };
 
-const drawerWidth = ref(400)
+const detailOpen = ref(false)
+
+const drawerWidth = computed(() => {
+    if (detailOpen.value) {
+        return 800;
+    } else {
+        return 400;
+    }
+})
 
 const openDetail = () => {
-    if (drawerWidth.value == 400) {
-        drawerWidth.value = 800
-    } else {
-        drawerWidth.value = 400
-    }
+    detailOpen.value = !detailOpen.value
 }
 
 </script>
@@ -42,16 +47,26 @@ const openDetail = () => {
     </a-float-button>
 
     <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
-        @close="onClose">
+        @close="onClose" :mask="false">
+        <template #extra>
+            <a-button type="text" style="margin-right: 0px" @click="onClose">
+                <template #icon>
+                    <DoubleLeftOutlined />
+                </template>
+            </a-button>
+        </template>
         <a-switch :checked="!loading" @change="onChange" />
         <template v-if="loading">
             <TourItemLoading />
         </template>
         <template v-else>
-            <a-space direction="vertical" :size="12">
-                <TourItem @open-detail="openDetail" />
-                <TourItem @open-detail="openDetail" />
-                <TourItem @open-detail="openDetail" />
+            <a-space direction="horizontal" :size="30">
+                <a-space direction="vertical" :size="12">
+                    <TourItem @open-detail="openDetail" />
+                    <TourItem @open-detail="openDetail" />
+                    <TourItem @open-detail="openDetail" />
+                </a-space>
+                <TravelDetail v-show="detailOpen" />
             </a-space>
         </template>
     </a-drawer>
@@ -60,7 +75,7 @@ const openDetail = () => {
 <style>
 /* 스크롤바의 폭 너비 */
 .ant-drawer-body::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
 }
 
 .ant-drawer-body::-webkit-scrollbar-thumb {

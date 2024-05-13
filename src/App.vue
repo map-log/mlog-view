@@ -7,6 +7,7 @@ import MapboxGlobe from './components/MapboxGlobe.vue'
 </script>
 
 <template>
+  <img src="" />
   <TourView />
   <UserView />
   <TourCreateView />
@@ -19,5 +20,9 @@ html,
 body {
   margin: 0;
   padding: 0;
+}
+
+body:-webkit-scrollbar {
+  display: none;
 }
 </style>

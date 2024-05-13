@@ -31,6 +31,6 @@ const openDetail = () => {
                 </template>
             </a-card-meta>
         </a-card>
-        <TravelDetail v-if="open" />
+        <!-- <TravelDetail v-if="open" /> -->
     </a-space>
 </template>
