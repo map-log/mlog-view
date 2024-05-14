@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { AlignCenterOutlined } from '@ant-design/icons-vue'
+import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue'
 import TourList from '@/components/Tour/TourList.vue'
 import Loading from '@/components/Util/Loading.vue'
 import TravelList from '@/components/Travel/TravelList.vue'
+
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -48,6 +49,13 @@ const openDetail = () => {
 
     <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
         @close="onClose" :mask="false">
+        <template #extra>
+            <a-button type="text" style="margin-right: 0px" @click="onClose">
+                <template #icon>
+                    <DoubleLeftOutlined />
+                </template>
+            </a-button>
+        </template>
         <a-tabs v-model:activeKey="activeKey">
             <a-tab-pane key="1" tab="내 여행 기록">
                 <TravelList />
