@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue'
-import TourItem from '@/components/TourItem.vue'
-import TourItemLoading from '@/components/TourItemLoading.vue'
-import TravelDetail from '@/components/TravelDetail.vue'
+import { AlignCenterOutlined } from '@ant-design/icons-vue'
+import TourList from '@/components/Tour/TourList.vue'
+import Loading from '@/components/Util/Loading.vue'
+import TravelList from '@/components/Travel/TravelList.vue'
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -50,36 +50,12 @@ const openDetail = () => {
         @close="onClose" :mask="false">
         <a-tabs v-model:activeKey="activeKey">
             <a-tab-pane key="1" tab="내 여행 기록">
-                <!-- <template #extra>
-                    <a-button type="text" style="margin-right: 0px" @click="onClose">
-                        <template #icon>
-                            <DoubleLeftOutlined />
-                        </template>
-                    </a-button>
-                </template>
-                <a-switch :checked="!loading" @change="onChange" />
-                <template v-if="loading">
-                    <TourItemLoading />
-                </template>
-                <template v-else>
-                    <a-space direction="horizontal" :size="30">
-                        <a-space direction="vertical" :size="12">
-                            <TourItem @open-detail="openDetail" />
-                            <TourItem @open-detail="openDetail" />
-                            <TourItem @open-detail="openDetail" />
-                        </a-space>
-                        <TravelDetail v-show="detailOpen" />
-                    </a-space>
-                </template> -->
+                <TravelList />
             </a-tab-pane>
             <a-tab-pane key="2" tab="관광지 정보">
-                <a-space direction="horizontal" :size="30">
-                    <a-space direction="vertical" :size="12">
-                        <TourItem />
-                    </a-space>
-                </a-space>
+                <TourList />
+
             </a-tab-pane>
-            <a-tab-pane key="3" tab="Tab 3">Content of Tab Pane 3</a-tab-pane>
         </a-tabs>
     </a-drawer>
 </template>
