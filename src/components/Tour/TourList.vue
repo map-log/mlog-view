@@ -63,6 +63,12 @@ const createMarker = (latitude, longitude, img) => {
         coordinates: [latitude, longitude],
     };
 }
+
+const find = (latitude, longitude) => {
+    console.log(`${latitude} ${longitude}`),
+        { coordinates: [latitude, longitude], }
+}
+
 </script>
 
 <template>
@@ -72,7 +78,8 @@ const createMarker = (latitude, longitude, img) => {
             <a-button type="primary" @click="searchAttraction">검색</a-button>
         </a-space>
         <a-space direction="vertical" :size="10" style="width: 100%">
-            <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station" />
+            <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station"
+                @click="find(station.mapx, station.mapy)" />
         </a-space>
     </a-space>
 </template>
