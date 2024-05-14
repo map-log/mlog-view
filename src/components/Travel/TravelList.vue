@@ -1,13 +1,13 @@
 <script setup>
 import { ref } from 'vue';
-import TravelDetailItem from '@/components/TravelDetailItem.vue'
+import TravelListItem from '@/components/Travel/TravelListItem.vue'
 
 </script>
 <template>
     <a-timeline>
         <h3>대제목</h3>
-        <TravelDetailItem />
-        <TravelDetailItem />
+        <TravelListItem />
+        <TravelListItem />
     </a-timeline>
 </template>
 
