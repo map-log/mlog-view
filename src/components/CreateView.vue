@@ -79,30 +79,6 @@ const previewImage = ref('');
 const previewTitle = ref('');
 const fileList = ref([
     {
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-3',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-4',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
         uid: '-xxx',
         percent: 50,
         name: 'image.png',
@@ -139,7 +115,6 @@ const success = () => {
             () => message.success('저장 성공!!!', 2.5),
         )
 };
-
 </script>
 
 <template>
@@ -186,7 +161,14 @@ const success = () => {
         <template #extra>
             <a-space>
                 <a-button @click="onClose">취소</a-button>
-                <a-button type="primary" @click="success">저장</a-button>
+                <a-button type="black" @click="success">저장</a-button>
+            </a-space>
+        </template>
+
+        <template #footer>
+            <a-space :size="10">
+                <a-button key="다음일정" @click="handleCancel">다음일정</a-button>
+                <a-button key="submit" type="primary" :loading="loading" @click="handleOk">완료!!</a-button>
             </a-space>
         </template>
     </a-drawer>

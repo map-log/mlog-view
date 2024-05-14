@@ -3,8 +3,6 @@ import { ref, watch, onMounted } from 'vue';
 import { useMapStore } from "@/stores/map";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { storeToRefs } from "pinia";
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGVsbG9tYXRpYSIsImEiOiJjbHcwYmgwNG8xaWFiMnFvZzA0N2F0bHR5In0.mtCVIIEYY0CyDn7uQCg4Mg';
@@ -80,35 +78,8 @@ onMounted(() => {
         spinGlobe(map);
     });
 
-    const mapStore = useMapStore();
+    printMarker(map);
 
-    for (const marker of mapStore.markerList) {
-        // Create a DOM element for each marker.
-        const el = document.createElement('div');
-        el.className = 'marker';
-        el.style.backgroundImage = `url(${marker.img})`;
-        el.style.width = `40px`;
-        el.style.height = `40px`;
-        el.style.backgroundSize = '100%';
-
-        el.addEventListener('click', () => {
-            window.alert("click");
-        });
-
-        // Add markers to the map.
-        new mapboxgl.Marker(el)
-            .setLngLat(marker.coordinates)
-            .addTo(map);
-    }
-
-    // 검색
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
-    spinGlobe(map);
 });
 
 const { markerList } = storeToRefs(mapStore)
@@ -123,22 +94,24 @@ const printMarker = (map) => {
         const el = document.createElement('div');
         el.className = 'marker';
         el.style.backgroundImage = `url(${marker.img})`;
-        el.style.width = `80px`;
-        el.style.height = `80px`;
+        el.style.width = `60px`;
+        el.style.height = `60px`;
         el.style.backgroundSize = '100%';
 
-        el.addEventListener('click', () => {
-            window.alert("click");
-        });
+        const popup = new mapboxgl.Popup({ offset: 50 })
+            .setHTML('<h1>Hello World!</h1>')
 
         // Add markers to the map.
         new mapboxgl.Marker(el)
             .setLngLat(marker.coordinates)
+            .setPopup(popup)
             .addTo(map);
+
+        el.addEventListener('click', () => {
+            map.easeTo({ center: marker.coordinates, duration: 1000 });
+        });
     }
 }
-
-
 
 </script>
 
@@ -146,6 +119,16 @@ const printMarker = (map) => {
     <img class="logo" width="250" src="@/assets/m-log-logo.png" />
     <div ref="mapContainer" class="map-container"></div>
 </template>
+
+<style>
+.marker {
+    display: block;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+}
+</style>
 
 <style scoped>
 .map-container {
