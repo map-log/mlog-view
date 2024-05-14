@@ -71,7 +71,6 @@ onMounted(() => {
         spinGlobe();
     });
 
-    // 마커 및 기타 코드 여기 추가...
     // 마커
     const geojson = {
         'type': 'FeatureCollection',
