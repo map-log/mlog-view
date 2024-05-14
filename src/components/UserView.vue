@@ -1,6 +1,13 @@
 <script setup>
-import { ref } from 'vue';
 import { UserOutlined } from '@ant-design/icons-vue'
+
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const navigateToLogin = () => {
+    router.push({ name: 'login' });
+};
 
 </script>
 
@@ -12,8 +19,8 @@ import { UserOutlined } from '@ant-design/icons-vue'
             <template #icon>
                 <UserOutlined />
             </template>
-            <a-float-button />
-            <a-float-button />
+            <a-float-button @click="navigateToLogin" />
+            <a-float-button @click="navigateToLogin" />
         </a-float-button-group>
 
     </div>
