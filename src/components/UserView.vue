@@ -9,6 +9,10 @@ const navigateToLogin = () => {
     router.push({ name: 'login' });
 };
 
+const navigateToUserInfo = () => {
+    router.push({ name: 'userInfo' })
+}
+
 </script>
 
 <template>
@@ -20,7 +24,7 @@ const navigateToLogin = () => {
                 <UserOutlined />
             </template>
             <a-float-button @click="navigateToLogin" />
-            <a-float-button @click="navigateToLogin" />
+            <a-float-button @click="navigateToUserInfo" />
         </a-float-button-group>
 
     </div>
