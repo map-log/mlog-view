@@ -1,9 +1,8 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import {  ref } from 'vue';
 import axios from "axios";
 import TourListItem from "./TourListItem.vue";
 import { useMapStore } from "@/stores/map";
-
 
 const { VITE_OPEN_API_SERVICE_KEY, VITE_SEARCH_TRIP_URL } = import.meta.env;
 
@@ -17,52 +16,54 @@ const params = ref({
     MobileApp: "AppTest",
     _type: "json",
     keyword: "",
-})
+});
 
 const tripStation = ref([]);
 
-// const computedTripStation = computed(() => {
-//     return tripStation.value;
-// })
-
-// 키워드에 따른 데이터 조회, debounce로 호출 지연
 const searchAttraction = () => {
     axios
         .get(VITE_SEARCH_TRIP_URL, { params: params.value })
         .then(({ data }) => {
-            console.log(params.value.keyword)
-            tripStation.value = data.response.body.items.item
-            console.log(tripStation.value)
-            addMarker(tripStation.value)
-        })
-}
-
-// const watchStations = watch((tripStation), (newValue) => {
-//     addMarker(newValue)
-// })
+            tripStation.value = data.response.body.items.item;
+            addMarker(tripStation.value);
+        });
+};
 
 const addMarker = (stations) => {
-    mapStore.reset()
-    const markers = []
+    mapStore.reset();
+    const markers = [];
     for (const station of stations) {
         markers.push(
             createMarker(
-                station.mapx,
-                station.mapy,
+                station.mapy,  // 위도와 경도 순서 변경
+                station.mapx,  // 위도와 경도 순서 변경
                 station.firstimage,
             )
-        )
+        );
     }
-    mapStore.markerList = markers
-}
-
+    mapStore.markerList = markers;
+};
 
 const createMarker = (latitude, longitude, img) => {
     return {
         img: img,
-        coordinates: [latitude, longitude],
+        coordinates: [longitude, latitude], // 좌표 배열 순서 수정
     };
-}
+};
+
+// find 함수는 global map 변수를 사용해야 합니다.
+const find = (latitude, longitude) => {
+    if (window.map) {
+        window.map.flyTo({
+            center: [longitude, latitude], // 위도와 경도 순서 변경
+            essential: true,
+            zoom: 14
+        });
+
+        const marker = createMarker(latitude, longitude, '');
+        mapStore.markerList = [marker];
+    }
+};
 </script>
 
 <template>
@@ -72,7 +73,8 @@ const createMarker = (latitude, longitude, img) => {
             <a-button type="primary" @click="searchAttraction">검색</a-button>
         </a-space>
         <a-space direction="vertical" :size="10" style="width: 100%">
-            <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station" />
+            <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station"
+                @click="find(station.mapy, station.mapx)" /> <!-- 위도와 경도 순서 변경 -->
         </a-space>
     </a-space>
 </template>
@@ -91,7 +93,6 @@ const createMarker = (latitude, longitude, img) => {
     border-color: #007bff;
 }
 
-/* 추가한 스타일 */
 a-space.horizontal {
     display: flex;
     align-items: center;
