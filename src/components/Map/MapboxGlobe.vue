@@ -10,12 +10,13 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiaGVsbG9tYXRpYSIsImEiOiJjbHcwYmgwNG8xaWFiMnFvZ
 const mapStore = useMapStore();
 const mapContainer = ref(null);
 const secondsPerRevolution = 120;
-const maxSpinZoom = 5; // 5초 동안 확대 상태 유지
+const maxSpinZoom = 5;
 let userInteracting = false;
 let spinEnabled = true;
 let zoomTimer = null;
 
-var map;
+// 전역 변수를 window 객체에 추가하여 어디서든 접근 가능하도록 설정
+window.map = null;
 
 const getMap = () => {
     return new mapboxgl.Map({
@@ -24,7 +25,7 @@ const getMap = () => {
         center: [126, 35],
         zoom: 2
     });
-}
+};
 
 const spinGlobe = (map) => {
     if (spinEnabled && !userInteracting) {
@@ -36,61 +37,59 @@ const spinGlobe = (map) => {
 };
 
 onMounted(() => {
-    map = getMap();
+    window.map = getMap();
 
-    map.on('zoomstart', () => {
-        spinEnabled = false; // Zoom 시작 시 회전 비활성화
+    window.map.on('zoomstart', () => {
+        spinEnabled = false;
     });
 
-    map.on('zoomend', () => {
-        if (map.getZoom() < maxSpinZoom) {
+    window.map.on('zoomend', () => {
+        if (window.map.getZoom() < maxSpinZoom) {
             setTimeout(() => {
                 spinEnabled = true;
-                spinGlobe(map); // Zoom 종료 후 회전 재개
-            }, 5000); // 잠시 후 회전 재개를 위해 지연 시간 설정
+                spinGlobe(window.map);
+            }, 5000);
         }
     });
 
-    map.on('mousedown', () => {
+    window.map.on('mousedown', () => {
         userInteracting = true;
         clearTimeout(zoomTimer);
     });
 
-    map.on('mouseup', () => {
+    window.map.on('mouseup', () => {
         userInteracting = false;
-        spinGlobe(map);
+        spinGlobe(window.map);
     });
 
-    map.on('dragend', () => {
+    window.map.on('dragend', () => {
         userInteracting = false;
-        spinGlobe(map);
+        spinGlobe(window.map);
     });
-    map.on('pitchend', () => {
+    window.map.on('pitchend', () => {
         userInteracting = false;
-        spinGlobe(map);
+        spinGlobe(window.map);
     });
-    map.on('rotateend', () => {
+    window.map.on('rotateend', () => {
         userInteracting = false;
-        spinGlobe(map);
+        spinGlobe(window.map);
     });
 
-    map.on('moveend', () => {
-        spinGlobe(map);
+    window.map.on('moveend', () => {
+        spinGlobe(window.map);
     });
 
-    printMarker(map);
-
+    printMarker(window.map);
 });
 
-const { markerList } = storeToRefs(mapStore)
+const { markerList } = storeToRefs(mapStore);
 
 const watchMarker = watch(markerList, () => {
-    printMarker(map);
-})
+    printMarker(window.map);
+});
 
 const printMarker = (map) => {
     for (const marker of mapStore.markerList) {
-        // Create a DOM element for each marker.
         const el = document.createElement('div');
         el.className = 'marker';
         el.style.backgroundImage = `url(${marker.img})`;
@@ -99,9 +98,8 @@ const printMarker = (map) => {
         el.style.backgroundSize = '100%';
 
         const popup = new mapboxgl.Popup({ offset: 50 })
-            .setHTML('<h1>Hello World!</h1>')
+            .setHTML('<h1>Hello World!</h1>');
 
-        // Add markers to the map.
         new mapboxgl.Marker(el)
             .setLngLat(marker.coordinates)
             .setPopup(popup)
@@ -111,8 +109,7 @@ const printMarker = (map) => {
             map.easeTo({ center: marker.coordinates, duration: 1000 });
         });
     }
-}
-
+};
 </script>
 
 <template>
@@ -144,6 +141,5 @@ const printMarker = (map) => {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
-    /* 이미지가 맵 위에 겹치도록 설정 */
 }
 </style>
