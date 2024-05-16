@@ -103,6 +103,21 @@ const success = () => {
             () => message.success('저장 성공!!!', 2.5),
         )
 };
+
+const detailedSchedules = ref([])
+
+const addDetailSchedule = () => {
+    detailedSchedules.value.push({
+        fileList: [],
+        title: "",
+        description: "",
+    })
+}
+
+const removeDetailSchedule = (index) => {
+    detailedSchedules.value.splice(index, 1);
+}
+
 </script>
 
 <template>
@@ -119,15 +134,12 @@ const success = () => {
     <a-drawer title="여행 기록 추가하기" :width="500" :open="open" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose">
 
-        <h3>제목</h3>
-        <a-input v-model:value="form.name" placeholder="나의 행복한 여행..." />
-
         <!-- 사진 추가 -->
-        <h3>대표 사진</h3>
+        <h3>사진</h3>
         <div class="clearfix">
             <a-upload v-model:file-list="fileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 list-type="picture-card" @preview="handlePreview">
-                <div v-if="fileList.length < 8">
+                <div v-if="fileList.length < 1">
                     <plus-outlined />
                     <div style="margin-top: 8px">Upload</div>
                 </div>
@@ -137,6 +149,12 @@ const success = () => {
             </a-modal>
         </div>
 
+        <h3>위치</h3>
+        <GoogleMap />
+
+        <h3>제목</h3>
+        <a-input v-model:value="form.name" placeholder="나의 행복한 여행..." />
+
         <!-- 일정 추가 -->
         <h3>일정</h3>
         <a-range-picker :size="large" :placement="bottomRight" v-model:value="value1" :bordered="false" />
@@ -144,15 +162,43 @@ const success = () => {
         <h3>별점</h3>
         <a-rate v-model:value="value" allow-half />
 
-        <h3>설명</h3>
+        <h3>한줄평!</h3>
         <a-textarea v-model:value="form.description" :rows="4" placeholder="여행을 설명해주세요..." />
 
-        <h3>위치</h3>
-        <GoogleMap />
+        
 
+        <div class="wavy"></div>
 
-        <a-button type="primary">상세 일정 추가하기</a-button>
+        <div v-for="(detail, index) in detailedSchedules" :key="index" class="detail-schedule">
+            <a-flex justify="space-between" align="center">
+                <h2>{{ index + 1 }}.</h2>
+                <a-button type="primary" danger ghost @click="removeDetailSchedule(index)">삭제</a-button>
+            </a-flex>
+            
+            <h3>제목</h3>
+            <a-input v-model:value="detail.title" placeholder="제목" />
 
+            <h3>사진</h3>
+            <a-upload
+                list-type="picture-card"
+                v-model:file-list="detail.fileList"
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                @preview="handlePreview"
+            >
+                <div v-if="detail.fileList.length < 3">
+                    <plus-outlined />
+                    <div style="margin-top: 8px">사진 추가</div>
+                </div>
+            </a-upload>
+
+            <h3>설명</h3>
+            <a-textarea v-model:value="detail.description" :rows="3" placeholder="일정 설명" />
+            <div class="wavy"></div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <a-button type="dashed" @click="addDetailSchedule">상세 기록 추가하기</a-button>
+        </div>
 
         <template #footer>
             <a-space :size="10">
@@ -174,4 +220,40 @@ const success = () => {
     margin-top: 8px;
     color: #666;
 }
+
+.wavy
+{
+    position:relative;
+    width: 100%;
+    height: 50px;
+    overflow: hidden;
+}
+
+.wavy::before
+{
+    content: 'aaaaaaaaaaaaaaaaaaaaaa';
+    position: absolute;
+    top: -42px;
+    left: 0;
+    font-size: 4em;
+    color: transparent;
+    text-decoration-style: wavy;
+    text-decoration-color: #858585;
+    text-decoration-line: underline;
+    animation: animate 2s linear infinite;
+}
+
+/* @keyframes animate
+{
+    0%
+    {
+        transform: translateX(-1px);
+    }
+
+    100%
+    {
+        transform: translateX(-56px);
+    }
+} */
+
 </style>

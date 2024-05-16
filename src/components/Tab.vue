@@ -65,24 +65,6 @@ const closeTourDetailDrawer = () => {
     </a-float-button>
 
     <div class="drawer-container">
-        <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
-            @close="onClose" :mask="false" class="main-drawer">
-            <template #extra>
-                <a-button type="text" style="margin-right: 0px" @click="onClose">
-                    <template #icon>
-                        <DoubleLeftOutlined />
-                    </template>
-                </a-button>
-            </template>
-            <a-tabs v-model:activeKey="activeKey">
-                <a-tab-pane key="1" tab="내 여행 기록">
-                    <TravelListItem @itemClick="showItemDetailDrawer" />
-                </a-tab-pane>
-                <a-tab-pane key="2" tab="관광지 정보">
-                    <TourList @itemClick="showTourDetailDrawer" />
-                </a-tab-pane>
-            </a-tabs>
-        </a-drawer>
 
         <!-- 두 번째 drawer -->
         <a-drawer title="상세 정보" :placement="'left'" :width="400" :open="itemDetailOpen" :mask="false" :closable="false"
@@ -109,6 +91,26 @@ const closeTourDetailDrawer = () => {
             </template>
             <TourListItemDetail :item="selectedTourItem" />
         </a-drawer>
+
+        <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
+            @close="onClose" :mask="false" class="main-drawer">
+            <template #extra>
+                <a-button type="text" style="margin-right: 0px" @click="onClose">
+                    <template #icon>
+                        <DoubleLeftOutlined />
+                    </template>
+                </a-button>
+            </template>
+            <a-tabs v-model:activeKey="activeKey">
+                <a-tab-pane key="1" tab="내 여행 기록">
+                    <TravelListItem @itemClick="showItemDetailDrawer" />
+                </a-tab-pane>
+                <a-tab-pane key="2" tab="관광지 정보">
+                    <TourList @itemClick="showTourDetailDrawer" />
+                </a-tab-pane>
+            </a-tabs>
+        </a-drawer>
+
     </div>
 </template>
 
