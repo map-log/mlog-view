@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue'
-import TourList from '@/components/Tour/TourList.vue'
-import Loading from '@/components/Util/Loading.vue'
-import TravelList from '@/components/Travel/TravelList.vue'
-
+import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
+import TourList from '@/components/Tour/TourList.vue';
+import TravelListItem from '@/components/Travel/TravelListItem.vue';
+import TravelListItemInfo from '@/components/Travel/TravelListItemInfo.vue';
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -14,14 +13,10 @@ const showDrawer = () => {
 };
 const onClose = () => {
     open.value = false;
+    closeItemDetailDrawer(); // 두 번째 drawer도 닫기
 };
 
-const loading = ref(true);
-const onChange = checked => {
-    loading.value = !checked;
-};
-
-const detailOpen = ref(false)
+const detailOpen = ref(false);
 
 const drawerWidth = computed(() => {
     if (detailOpen.value) {
@@ -29,43 +24,65 @@ const drawerWidth = computed(() => {
     } else {
         return 400;
     }
-})
+});
 
 const openDetail = () => {
-    detailOpen.value = !detailOpen.value
-}
+    detailOpen.value = !detailOpen.value;
+};
 
+// 새로운 drawer 관련 상태 및 메서드
+const itemDetailOpen = ref(false);
+const selectedItem = ref(null);
+const showItemDetailDrawer = item => {
+    selectedItem.value = item;
+    itemDetailOpen.value = true;
+};
+const closeItemDetailDrawer = () => {
+    itemDetailOpen.value = false;
+    selectedItem.value = null;
+};
 </script>
 
 <template>
-    <a-float-button type="default" :style="{
-        top: '24px',
-        left: '24px',
-    }" @click="showDrawer">
+    <a-float-button type="default" :style="{ top: '24px', left: '24px' }" @click="showDrawer">
         <template #icon>
             <AlignCenterOutlined />
         </template>
     </a-float-button>
 
-    <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
-        @close="onClose" :mask="false">
-        <template #extra>
-            <a-button type="text" style="margin-right: 0px" @click="onClose">
-                <template #icon>
-                    <DoubleLeftOutlined />
-                </template>
-            </a-button>
-        </template>
-        <a-tabs v-model:activeKey="activeKey">
-            <a-tab-pane key="1" tab="내 여행 기록">
-                <TravelList />
-            </a-tab-pane>
-            <a-tab-pane key="2" tab="관광지 정보">
-                <TourList />
+    <div class="drawer-container">
+        <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
+            @close="onClose" :mask="false" class="main-drawer">
+            <template #extra>
+                <a-button type="text" style="margin-right: 0px" @click="onClose">
+                    <template #icon>
+                        <DoubleLeftOutlined />
+                    </template>
+                </a-button>
+            </template>
+            <a-tabs v-model:activeKey="activeKey">
+                <a-tab-pane key="1" tab="내 여행 기록">
+                    <TravelListItem @itemClick="showItemDetailDrawer" />
+                </a-tab-pane>
+                <a-tab-pane key="2" tab="관광지 정보">
+                    <TourList />
+                </a-tab-pane>
+            </a-tabs>
+        </a-drawer>
 
-            </a-tab-pane>
-        </a-tabs>
-    </a-drawer>
+        <!-- 두 번째 drawer -->
+        <a-drawer title="상세 정보" :placement="'left'" :width="400" :open="itemDetailOpen" :mask="false" :closable="false"
+            class="secondary-drawer">
+            <template #extra>
+                <a-button type="text" style="margin-right: 0px" @click="closeItemDetailDrawer">
+                    <template #icon>
+                        <DoubleLeftOutlined />
+                    </template>
+                </a-button>
+            </template>
+            <TravelListItemInfo :item="selectedItem" />
+        </a-drawer>
+    </div>
 </template>
 
 <style>
@@ -84,5 +101,28 @@ const openDetail = () => {
 .ant-drawer-body::-webkit-scrollbar-track {
     background: rgb(255, 255, 255);
     /*스크롤바 뒷 배경 색상*/
+}
+
+/* 두 drawer가 나란히 배치되도록 스타일링 */
+.drawer-container {
+    display: flex;
+}
+
+.main-drawer {
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+}
+
+.secondary-drawer {
+    flex-shrink: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transition: transform 0.3s ease;
+    transform: translateX(100%);
+}
+
+.secondary-drawer.open {
+    transform: translateX(0);
 }
 </style>
