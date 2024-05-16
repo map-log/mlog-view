@@ -2,6 +2,7 @@
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue';
 import { message } from 'ant-design-vue';
+import GoogleMap from '@/components/Map/GoogleMap.vue'
 
 const form = reactive({
     name: '',
@@ -77,20 +78,7 @@ function getBase64(file) {
 const previewVisible = ref(false);
 const previewImage = ref('');
 const previewTitle = ref('');
-const fileList = ref([
-    {
-        uid: '-xxx',
-        percent: 50,
-        name: 'image.png',
-        status: 'uploading',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-        uid: '-5',
-        name: 'image.png',
-        status: 'error',
-    },
-]);
+const fileList = ref([]);
 const handleCancel = () => {
     previewVisible.value = false;
     previewTitle.value = '';
@@ -128,10 +116,14 @@ const success = () => {
     </a-float-button>
 
     <!-- 여행 기록 추가 form -->
-    <a-drawer title="여행 일정 추가하기" :width="500" :open="open" :body-style="{ paddingBottom: '80px' }"
+    <a-drawer title="여행 기록 추가하기" :width="500" :open="open" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose">
 
+        <h3>제목</h3>
+        <a-input v-model:value="form.name" placeholder="나의 행복한 여행..." />
+
         <!-- 사진 추가 -->
+        <h3>대표 사진</h3>
         <div class="clearfix">
             <a-upload v-model:file-list="fileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 list-type="picture-card" @preview="handlePreview">
@@ -152,23 +144,19 @@ const success = () => {
         <h3>별점</h3>
         <a-rate v-model:value="value" allow-half />
 
-        <h3>제목</h3>
-        <a-input v-model:value="form.name" placeholder="나의 행복한 여행..." />
-
         <h3>설명</h3>
         <a-textarea v-model:value="form.description" :rows="4" placeholder="여행을 설명해주세요..." />
 
-        <template #extra>
-            <a-space>
-                <a-button @click="onClose">취소</a-button>
-                <a-button type="black" @click="success">저장</a-button>
-            </a-space>
-        </template>
+        <h3>위치</h3>
+        <GoogleMap />
+
+
+        <a-button type="primary">상세 일정 추가하기</a-button>
+
 
         <template #footer>
             <a-space :size="10">
-                <a-button key="다음일정" @click="handleCancel">다음일정</a-button>
-                <a-button key="submit" type="primary" :loading="loading" @click="handleOk">완료!!</a-button>
+                <a-button key="submit" type="primary" :loading="loading" @click="success">완료!!</a-button>
             </a-space>
         </template>
     </a-drawer>

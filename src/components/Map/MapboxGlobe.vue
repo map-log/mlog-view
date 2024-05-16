@@ -4,8 +4,10 @@ import { useMapStore } from "@/stores/map";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
 import { storeToRefs } from "pinia";
+const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiaGVsbG9tYXRpYSIsImEiOiJjbHcwYmgwNG8xaWFiMnFvZzA0N2F0bHR5In0.mtCVIIEYY0CyDn7uQCg4Mg';
+
+mapboxgl.accessToken = VITE_MAPBOX_ACCESSTOKEN;
 
 const mapStore = useMapStore();
 const mapContainer = ref(null);
@@ -21,7 +23,7 @@ window.map = null;
 const getMap = () => {
     return new mapboxgl.Map({
         container: mapContainer.value,
-        style: 'mapbox://styles/hellomatia/cluw85rzw001u01rjaw85873u',
+        style: VITE_MAPBOX_STYLE,
         center: [126, 35],
         zoom: 2
     });
