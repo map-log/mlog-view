@@ -6,19 +6,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 
 const { VITE_GOOGLE_MAP_API } = import.meta.env;
 
+const props = defineProps({
+    lat: Number,
+    lng: Number
+});
 
 const mapContainer = ref(null);
+const map = ref(null);
 const marker = ref(null);
-const markerPosition = ref({ lat: 40.689247, lng: -74.044502 });
-
+const markerPosition = ref({ lat: parseFloat(props.lat) || 40.689247, lng: parseFloat(props.lng) || -74.044502 });
 
 onMounted(() => {
-
     const loader = new Loader({
         apiKey: VITE_GOOGLE_MAP_API,
         version: 'weekly',
@@ -26,22 +29,38 @@ onMounted(() => {
     });
 
     loader.load().then(() => {
-        const map = new google.maps.Map(mapContainer.value, {
+        map.value = new google.maps.Map(mapContainer.value, {
             center: markerPosition.value,
-            zoom: 8,
+            zoom: 15,
         });
 
         marker.value = new google.maps.Marker({
             position: markerPosition.value,
-            map,
+            map: map.value,
             draggable: true,
         });
 
-        map.addListener('center_changed', () => {
-            markerPosition.value = map.getCenter().toJSON(); // 마커의 위치를 지도의 중심으로 설정
-            marker.value.setPosition(markerPosition.value); // 마커의 위치 업데이트
+        map.value.addListener('center_changed', () => {
+            markerPosition.value = map.value.getCenter().toJSON();
+            marker.value.setPosition(markerPosition.value);
         });
     });
+});
+
+watch(() => props.lat, (newLat) => {
+    markerPosition.value.lat = parseFloat(newLat);
+    if (map.value) {
+        map.value.setCenter(markerPosition.value);
+        marker.value.setPosition(markerPosition.value);
+    }
+});
+
+watch(() => props.lng, (newLng) => {
+    markerPosition.value.lng = parseFloat(newLng);
+    if (map.value) {
+        map.value.setCenter(markerPosition.value);
+        marker.value.setPosition(markerPosition.value);
+    }
 });
 </script>
 
