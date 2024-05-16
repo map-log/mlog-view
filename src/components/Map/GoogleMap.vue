@@ -16,10 +16,12 @@ const props = defineProps({
     lng: Number
 });
 
+const emit = defineEmits(['changePosition'])
+
 const mapContainer = ref(null);
 const map = ref(null);
 const marker = ref(null);
-const markerPosition = ref({ lat: parseFloat(props.lat) || 40.689247, lng: parseFloat(props.lng) || -74.044502 });
+const markerPosition = ref({ lat: parseFloat(props.lat) || 35.20448840587912, lng: parseFloat(props.lng) || 126.80853775734465 });
 
 onMounted(() => {
     const loader = new Loader({
@@ -43,6 +45,7 @@ onMounted(() => {
         map.value.addListener('center_changed', () => {
             markerPosition.value = map.value.getCenter().toJSON();
             marker.value.setPosition(markerPosition.value);
+            emit('changePosition', markerPosition.value.lat, markerPosition.value.lng);
         });
     });
 });

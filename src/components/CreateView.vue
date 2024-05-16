@@ -1,57 +1,21 @@
 <script setup>
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import GoogleMap from '@/components/Map/GoogleMap.vue'
 
-const form = reactive({
-    name: '',
-    url: '',
-    owner: '',
-    type: '',
-    approver: '',
-    dateTime: null,
+const form = ref({
+    img: '',
+    lat: '',
+    lng: '',
+    title: '',
+    dateRange: '',
+    rate: '',
     description: '',
 });
 
 const rules = {
-    name: [
-        {
-            required: true,
-            message: 'Please enter user name',
-        },
-    ],
-    url: [
-        {
-            required: true,
-            message: 'please enter url',
-        },
-    ],
-    owner: [
-        {
-            required: true,
-            message: 'Please select an owner',
-        },
-    ],
-    type: [
-        {
-            required: true,
-            message: 'Please choose the type',
-        },
-    ],
-    approver: [
-        {
-            required: true,
-            message: 'Please choose the approver',
-        },
-    ],
-    dateTime: [
-        {
-            required: true,
-            message: 'Please choose the dateTime',
-            type: 'object',
-        },
-    ],
+    
     description: [
         {
             required: true,
@@ -83,6 +47,7 @@ const handleCancel = () => {
     previewVisible.value = false;
     previewTitle.value = '';
 };
+
 const handlePreview = async file => {
     if (!file.url && !file.preview) {
         file.preview = await getBase64(file.originFileObj);
@@ -92,11 +57,9 @@ const handlePreview = async file => {
     previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
 };
 
-const value1 = ref();
-const value = ref(0);
-
 const success = () => {
     onClose()
+
     message
         .loading('저장중..', 2.5)
         .then(
@@ -117,6 +80,64 @@ const addDetailSchedule = () => {
 const removeDetailSchedule = (index) => {
     detailedSchedules.value.splice(index, 1);
 }
+
+const lat = ref(0)
+const lng = ref(0)
+
+const onChangePosition = (x, y) => {
+    console.log(x, y)
+    lat.value = x;
+    lng.value = y;
+    console.log(lat.value, lng.value)
+}
+
+const onSave = async () => {
+
+    // 모든 파일을 Base64로 변환
+    const images = await Promise.all(fileList.value.map(async file => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        return file.preview; // Base64 데이터 반환
+    }));
+
+    // 상세 일정의 각 파일을 Base64로 변환
+    const detailedSchedulesData = await Promise.all(detailedSchedules.value.map(async detail => {
+        const detailImages = await Promise.all(detail.fileList.map(async file => {
+            if (!file.url && !file.preview) {
+                file.preview = await getBase64(file.originFileObj);
+            }
+            return file.preview;
+        }));
+
+        return {
+            title: detail.title,
+            description: detail.description,
+            images: detailImages
+        };
+    }));
+
+    const travelData = {
+        name: form.name.value,
+        description: form.description.value,
+        images: images,
+        position: {
+            lat: lat.value,
+            lng: lng.value
+        },
+        dateRange: value1.value,
+        rating: value.value,
+        detailedSchedules: detailedSchedulesData
+    };
+
+    try {
+        await localAxios.post('/travel/save', travelData);
+        message.success('여행 기록이 성공적으로 저장되었습니다.');
+    } catch (error) {
+        message.error('저장 중 오류가 발생했습니다.');
+    }
+};
+
 
 </script>
 
@@ -150,22 +171,20 @@ const removeDetailSchedule = (index) => {
         </div>
 
         <h3>위치</h3>
-        <GoogleMap />
+        <GoogleMap @change-position="onChangePosition" />
 
         <h3>제목</h3>
-        <a-input v-model:value="form.name" placeholder="나의 행복한 여행..." />
+        <a-input v-model:value="form.title" placeholder="나의 행복한 여행..." />
 
         <!-- 일정 추가 -->
         <h3>일정</h3>
-        <a-range-picker :size="large" :placement="bottomRight" v-model:value="value1" :bordered="false" />
+        <a-range-picker :size="large" :placement="bottomRight" v-model:value="form.dateRange" :bordered="false" />
 
         <h3>별점</h3>
-        <a-rate v-model:value="value" allow-half />
+        <a-rate v-model:value="form.rate" allow-half />
 
         <h3>한줄평!</h3>
         <a-textarea v-model:value="form.description" :rows="4" placeholder="여행을 설명해주세요..." />
-
-        
 
         <div class="wavy"></div>
 
@@ -174,17 +193,13 @@ const removeDetailSchedule = (index) => {
                 <h2>{{ index + 1 }}.</h2>
                 <a-button type="primary" danger ghost @click="removeDetailSchedule(index)">삭제</a-button>
             </a-flex>
-            
+
             <h3>제목</h3>
             <a-input v-model:value="detail.title" placeholder="제목" />
 
             <h3>사진</h3>
-            <a-upload
-                list-type="picture-card"
-                v-model:file-list="detail.fileList"
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                @preview="handlePreview"
-            >
+            <a-upload list-type="picture-card" v-model:file-list="detail.fileList"
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76" @preview="handlePreview">
                 <div v-if="detail.fileList.length < 3">
                     <plus-outlined />
                     <div style="margin-top: 8px">사진 추가</div>
@@ -206,7 +221,6 @@ const removeDetailSchedule = (index) => {
             </a-space>
         </template>
     </a-drawer>
-
 </template>
 
 <style scoped>
@@ -221,16 +235,14 @@ const removeDetailSchedule = (index) => {
     color: #666;
 }
 
-.wavy
-{
-    position:relative;
+.wavy {
+    position: relative;
     width: 100%;
     height: 50px;
     overflow: hidden;
 }
 
-.wavy::before
-{
+.wavy::before {
     content: 'aaaaaaaaaaaaaaaaaaaaaa';
     position: absolute;
     top: -42px;
@@ -255,5 +267,4 @@ const removeDetailSchedule = (index) => {
         transform: translateX(-56px);
     }
 } */
-
 </style>
