@@ -1,16 +1,17 @@
 <template>
   <img class="logo" width="250" src="@/assets/m-log-logo.png" />
   <a-form :model="formState" name="normal_login" class="login-form" @finish="onFinish" @finishFailed="onFinishFailed">
-    <a-form-item label="Username" name="username" :rules="[{ required: true, message: 'Please input your username!' }]">
-      <a-input v-model:value="formState.username">
+    <a-form-item label="Email" name="principal" :rules="[{ required: true, message: 'Please input your email!' }]">
+      <a-input v-model:value="formState.principal">
         <template #prefix>
           <UserOutlined class="site-form-item-icon" />
         </template>
       </a-input>
     </a-form-item>
 
-    <a-form-item label="Password" name="password" :rules="[{ required: true, message: 'Please input your password!' }]">
-      <a-input-password v-model:value="formState.password">
+    <a-form-item label="Password" name="credentials"
+      :rules="[{ required: true, message: 'Please input your password!' }]">
+      <a-input-password v-model:value="formState.credentials">
         <template #prefix>
           <LockOutlined class="site-form-item-icon" />
         </template>
@@ -18,14 +19,14 @@
     </a-form-item>
 
     <a-form-item>
-      <a-form-item name="remember" no-style>
+      <!-- <a-form-item name="remember" no-style>
         <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
-      </a-form-item>
+      </a-form-item> -->
       <a class="login-form-forgot" href="">Forgot password</a>
     </a-form-item>
 
     <a-form-item>
-      <a-button :disabled="disabled" type="primary" html-type="submit" class="login-form-button">
+      <a-button :disabled="disabled" type="primary" html-type="submit" @click="login" class="login-form-button">
         Log in
       </a-button>
       <div class="login-form-link">
@@ -37,21 +38,47 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
-const formState = reactive({
-  username: '',
-  password: '',
-  remember: true,
+import { storeToRefs } from "pinia"
+import { useRouter } from "vue-router"
+import { useMemberStore } from "@/stores/member"
+import { ref, computed } from 'vue';
+
+const router = useRouter()
+
+const memberStore = useMemberStore()
+
+const { isLogin, isLoginError } = storeToRefs(memberStore)
+const { userLogin, getUserInfo, getMeInfo } = memberStore
+
+const formState = ref({
+  principal: '',
+  credentials: '',
 });
+
 const onFinish = values => {
   console.log('Success:', values);
 };
+
 const onFinishFailed = errorInfo => {
   console.log('Failed:', errorInfo);
 };
+
 const disabled = computed(() => {
-  return !(formState.username && formState.password);
+  return !(formState.value.principal && formState.value.credentials);
 });
+
+const login = async () => {
+  await userLogin(formState.value)
+  let token = sessionStorage.getItem("accessToken")
+  console.log(token)
+  console.log("isLogin: " + isLogin.value)
+  if (isLogin.value) {
+    getMeInfo()
+    getUserInfo()
+    router.replace("/")
+  }
+}
+
 </script>
 
 <style scoped>
