@@ -21,7 +21,7 @@
       <a-form-item name="remember" no-style>
         <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
       </a-form-item>
-      <a class="login-form-forgot" href="">Forgot password</a>
+      <a class="login-form-forgot" @click="navigateToFindPwd">Forgot password</a>
     </a-form-item>
 
     <a-form-item>
@@ -58,6 +58,9 @@ const router = useRouter();
 
 const navigateToJoin = () => {
   router.push({ name: 'Join' });
+};
+const navigateToFindPwd = () => {
+  router.push({ name: 'findPwd' });
 };
 </script>
 
