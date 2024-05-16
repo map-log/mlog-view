@@ -30,13 +30,14 @@
       </a-button>
       <div class="login-form-link">
         Or
-        <a href="">register now!</a>
+        <a @click="navigateToJoin">register now!</a>
       </div>
     </a-form-item>
   </a-form>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { reactive, computed } from 'vue';
 const formState = reactive({
   username: '',
@@ -52,6 +53,12 @@ const onFinishFailed = errorInfo => {
 const disabled = computed(() => {
   return !(formState.username && formState.password);
 });
+
+const router = useRouter();
+
+const navigateToJoin = () => {
+  router.push({ name: 'Join' });
+};
 </script>
 
 <style scoped>
