@@ -18,6 +18,9 @@
         </a-button>
       </a-form-item>
     </a-form>
+    <a-button type="default" @click="goHome" class="home-button">
+      Home
+    </a-button>
   </div>
 </template>
 
@@ -31,8 +34,6 @@ const router = useRouter();
 const memberStore = useMemberStore();
 const { userInfo } = storeToRefs(memberStore);
 
-console.log(userInfo.value);
-
 // 사용자 정보 예제 데이터
 const userProfile = ref({
   image: '@/assets/profile.jpg', // 프로필 사진 경로
@@ -43,6 +44,10 @@ const userProfile = ref({
 const onUpdateProfile = () => {
   console.log('Profile Updated:', userProfile);
   router.replace("/")
+};
+
+const goHome = () => {
+  router.replace("/");
 };
 </script>
 
@@ -75,5 +80,11 @@ const onUpdateProfile = () => {
 
 .update-button {
   margin-top: 10px;
+}
+
+.home-button {
+  display: block;
+  margin: 20px auto 0;
+  width: 100%;
 }
 </style>
