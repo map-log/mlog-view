@@ -24,8 +24,8 @@ const router = createRouter({
       component: UserInfoView,
     },
     {
-      path: "/Join",
-      name: "Join",
+      path: "/join",
+      name: "join",
       component: JoinView,
     },
     {
