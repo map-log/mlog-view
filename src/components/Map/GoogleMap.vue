@@ -1,7 +1,7 @@
 <template>
     <div>
         <div ref="mapContainer" class="map-container"></div>
-        <p>마커의 위치: {{ markerPosition }}</p>
+        <!-- <p>마커의 위치: {{ markerPosition }}</p> -->
     </div>
 </template>
 
