@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const useMapStore = defineStore("counter", () => {
+export const useMapStore = defineStore("mapStore", () => {
   const markerList = ref([]);
 
   function addMarker(latitude, longitude, img) {

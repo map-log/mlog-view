@@ -1,9 +1,5 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import TourView from "./components/Tab.vue";
-import UserView from "./components/UserView.vue";
-import TourCreateView from "./components/CreateView.vue";
-import MapboxGlobe from './components/Map/MapboxGlobe.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>

@@ -12,9 +12,6 @@
       <a-form-item label="Email" name="email">
         <a-input v-model:value="userProfile.email" />
       </a-form-item>
-      <a-form-item label="Phone" name="phone">
-        <a-input v-model:value="userProfile.phone" />
-      </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit" class="update-button">
           Update Profile
@@ -25,18 +22,27 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { ref } from 'vue';
+import { storeToRefs } from "pinia"
+import { useRouter } from "vue-router"
+import { useMemberStore } from "@/stores/member"
+
+const router = useRouter();
+const memberStore = useMemberStore();
+const { userInfo } = storeToRefs(memberStore);
+
+console.log(userInfo.value);
 
 // 사용자 정보 예제 데이터
-const userProfile = reactive({
+const userProfile = ref({
   image: '@/assets/profile.jpg', // 프로필 사진 경로
-  name: 'Jane Doe',
-  email: 'jane.doe@example.com',
-  phone: '123-456-7890' // 추가된 전화번호 필드
+  name: userInfo.value.name,
+  email: userInfo.value.email,
 });
 
 const onUpdateProfile = () => {
   console.log('Profile Updated:', userProfile);
+  router.replace("/")
 };
 </script>
 
