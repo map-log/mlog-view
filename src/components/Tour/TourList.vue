@@ -1,8 +1,8 @@
 <script setup>
-import {  ref } from 'vue';
-import axios from "axios";
-import TourListItem from "./TourListItem.vue";
-import { useMapStore } from "@/stores/map";
+import { ref } from 'vue';
+import axios from 'axios';
+import TourListItem from './TourListItem.vue';
+import { useMapStore } from '@/stores/map';
 
 const { VITE_OPEN_API_SERVICE_KEY, VITE_SEARCH_TRIP_URL } = import.meta.env;
 
@@ -12,10 +12,10 @@ const params = ref({
     serviceKey: VITE_OPEN_API_SERVICE_KEY,
     numOfRows: 10,
     pageNo: 1,
-    MobileOS: "ETC",
-    MobileApp: "AppTest",
-    _type: "json",
-    keyword: "",
+    MobileOS: 'ETC',
+    MobileApp: 'AppTest',
+    _type: 'json',
+    keyword: '',
 });
 
 const tripStation = ref([]);
@@ -51,13 +51,19 @@ const createMarker = (latitude, longitude, img) => {
     };
 };
 
+const emit = defineEmits(['itemClick'])
+
+const itemClick = (station) => {
+    emit("itemClick", station)
+}
+
 // find 함수는 global map 변수를 사용해야 합니다.
 const find = (latitude, longitude) => {
     if (window.map) {
         window.map.flyTo({
             center: [longitude, latitude], // 위도와 경도 순서 변경
             essential: true,
-            zoom: 14
+            zoom: 14,
         });
 
         const marker = createMarker(latitude, longitude, '');
@@ -74,7 +80,7 @@ const find = (latitude, longitude) => {
         </a-space>
         <a-space direction="vertical" :size="10" style="width: 100%">
             <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station"
-                @click="find(station.mapy, station.mapx)" /> <!-- 위도와 경도 순서 변경 -->
+                @click="find(station.mapy, station.mapx)" @itemClick="itemClick(station)" />
         </a-space>
     </a-space>
 </template>

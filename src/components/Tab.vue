@@ -4,6 +4,7 @@ import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
 import TourList from '@/components/Tour/TourList.vue';
 import TravelListItem from '@/components/Travel/TravelListItem.vue';
 import TravelListItemInfo from '@/components/Travel/TravelListItemInfo.vue';
+import TourListItemDetail from '@/components/Tour/TourListItemDetail.vue';
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -13,7 +14,8 @@ const showDrawer = () => {
 };
 const onClose = () => {
     open.value = false;
-    closeItemDetailDrawer(); // 두 번째 drawer도 닫기
+    closeItemDetailDrawer();
+    closeTourDetailDrawer();
 };
 
 const detailOpen = ref(false);
@@ -41,6 +43,18 @@ const closeItemDetailDrawer = () => {
     itemDetailOpen.value = false;
     selectedItem.value = null;
 };
+
+// 관광지 상세 정보 drawer 관련 상태 및 메서드 추가
+const tourDetailOpen = ref(false);
+const selectedTourItem = ref(null);
+const showTourDetailDrawer = item => {
+    selectedTourItem.value = item;
+    tourDetailOpen.value = true;
+};
+const closeTourDetailDrawer = () => {
+    tourDetailOpen.value = false;
+    selectedTourItem.value = null;
+};
 </script>
 
 <template>
@@ -65,7 +79,7 @@ const closeItemDetailDrawer = () => {
                     <TravelListItem @itemClick="showItemDetailDrawer" />
                 </a-tab-pane>
                 <a-tab-pane key="2" tab="관광지 정보">
-                    <TourList />
+                    <TourList @itemClick="showTourDetailDrawer" />
                 </a-tab-pane>
             </a-tabs>
         </a-drawer>
@@ -81,6 +95,19 @@ const closeItemDetailDrawer = () => {
                 </a-button>
             </template>
             <TravelListItemInfo :item="selectedItem" />
+        </a-drawer>
+
+        <!-- 관광지 상세 정보 drawer 추가 -->
+        <a-drawer title="관광지 상세 정보" :placement="'left'" :width="400" :open="tourDetailOpen" :mask="false"
+            :closable="false" class="secondary-drawer">
+            <template #extra>
+                <a-button type="text" style="margin-right: 0px" @click="closeTourDetailDrawer">
+                    <template #icon>
+                        <DoubleLeftOutlined />
+                    </template>
+                </a-button>
+            </template>
+            <TourListItemDetail :item="selectedTourItem" />
         </a-drawer>
     </div>
 </template>

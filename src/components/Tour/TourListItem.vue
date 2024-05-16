@@ -1,13 +1,11 @@
 <script setup>
-
 defineProps({
   station: Object,
-})
-
+});
 </script>
 
 <template>
-  <a-card hoverable style="width: 350px; margin-bottom: 12px;">
+  <a-card hoverable style="width: 350px; margin-bottom: 12px;" @click="$emit('itemClick', station)">
     <template #cover>
       <img v-if="station.firstimage" :alt="station.title" :src="station.firstimage"
         style="height: 250px; width: 100%; object-fit: contain;" />
@@ -34,7 +32,6 @@ defineProps({
   border-color: #007bff;
 }
 
-/* 추가한 스타일 */
 a-space.horizontal {
   display: flex;
   align-items: center;
