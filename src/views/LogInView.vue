@@ -31,7 +31,7 @@
       </a-button>
       <div class="login-form-link">
         Or
-        <a href="">register now!</a>
+        <a @click="navigateToJoin">register now!</a>
       </div>
     </a-form-item>
   </a-form>
