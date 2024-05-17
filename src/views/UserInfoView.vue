@@ -5,16 +5,25 @@
       <h1>{{ userProfile.name }}</h1>
       <p>{{ userProfile.email }}</p>
     </div>
-    <a-form :model="userProfile" @finish="onUpdateProfile" class="profile-form">
+    <a-form :model="userProfile" @finish="onModifyProfile" class="profile-form">
+      <a-form-item label="Id" name="id">
+        <a-input v-model:value="userProfile.id" disabled />
+      </a-form-item>
       <a-form-item label="Name" name="name">
         <a-input v-model:value="userProfile.name" />
       </a-form-item>
       <a-form-item label="Email" name="email">
         <a-input v-model:value="userProfile.email" />
       </a-form-item>
+      <a-form-item label="Password" name="password">
+        <a-input type="password" v-model:value="userProfile.password" />
+      </a-form-item>
+      <a-form-item label="Confirm Password" name="confirmPassword">
+        <a-input type="password" v-model:value="confirmPassword" />
+      </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit" class="update-button">
-          Update Profile
+          Modify Profile
         </a-button>
       </a-form-item>
     </a-form>
@@ -29,9 +38,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import { storeToRefs } from "pinia"
-import { useRouter } from "vue-router"
-import { useMemberStore } from "@/stores/member"
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useMemberStore } from '@/stores/member';
 import { message } from 'ant-design-vue';
 
 const router = useRouter();
@@ -40,24 +49,39 @@ const { userInfo } = storeToRefs(memberStore);
 
 const userProfile = ref({
   image: '@/assets/profile.jpg',
+  id: userInfo.value.id,
   name: userInfo.value.name,
   email: userInfo.value.email,
+  password: ''
 });
 
-const onUpdateProfile = () => {
-  console.log('Profile Updated:', userProfile);
-  router.replace("/")
+const confirmPassword = ref('');
+
+const onModifyProfile = async () => {
+  if (userProfile.value.password !== confirmPassword.value) {
+    message.error('비밀번호가 일치하지 않습니다.');
+    return;
+  }
+
+  try {
+    await memberStore.modifyUserProfile(userProfile.value, userProfile.value.id);
+    message.success('프로필 수정 성공!');
+    console.log(userProfile.value)
+    router.replace('/');
+  } catch (error) {
+    message.error('프로필 수정 실패: ' + error.message);
+  }
 };
 
 const goHome = () => {
-  router.replace("/");
+  router.replace('/');
 };
 
 const onDeleteAccount = async () => {
   try {
     await memberStore.deleteAccount(userInfo.value.id);
     message.success('회원 탈퇴 성공!');
-    router.replace("/"); // 탈퇴 후 홈으로 이동
+    router.replace('/'); // 탈퇴 후 홈으로 이동
   } catch (error) {
     message.error('회원 탈퇴 실패: ' + error.message);
   }

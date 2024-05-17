@@ -33,6 +33,10 @@ async function apiDeleteAccount(userid, success, fail) {
   await local.delete(`/user/${userid}`).then(success).catch(fail);
 }
 
+async function apiModifyUserProfile(param, userid, success, fail) {
+  await local.put(`/user/${userid}`, param).then(success).catch(fail);
+}
+
 export {
   userConfirm,
   findById,
@@ -41,4 +45,5 @@ export {
   logout,
   userRegister,
   apiDeleteAccount,
+  apiModifyUserProfile,
 };

@@ -11,6 +11,7 @@ import {
   logout,
   userRegister,
   apiDeleteAccount,
+  apiModifyUserProfile,
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 
@@ -177,12 +178,33 @@ export const useMemberStore = defineStore("memberStore", () => {
     );
   };
 
+  const modifyUserProfile = async (profileData, userid) => {
+    await apiModifyUserProfile(
+      profileData,
+      userid,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("프로필 수정 성공!!!!:");
+          userInfo.value.id = profileData.id;
+          userInfo.value.name = profileData.name;
+          userInfo.value.email = profileData.email;
+          userInfo.value.password = profileData.password;
+        }
+      },
+      (error) => {
+        console.log("프로필 수정 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
+
   return {
     isLogin,
     isLoginError,
     userInfo,
     isValidToken,
     deleteAccount,
+    modifyUserProfile,
     registerUser,
     userLogin,
     getUserInfo,
