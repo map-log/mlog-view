@@ -1,7 +1,7 @@
 <template>
   <div class="my-page">
     <div class="profile-header">
-      <img src="@/assets/m-log-logo.png" alt="profile image" class="profile-image" />
+      <img src="@/assets/m-log-logo.png" alt="profile image" class="profile-image" @click="navigateToHome" />
       <h1>{{ userProfile.name }}</h1>
       <p>{{ userProfile.email }}</p>
     </div>
@@ -75,6 +75,10 @@ const onModifyProfile = async () => {
 
 const goHome = () => {
   router.replace('/');
+};
+
+const navigateToHome = () => {
+  router.push({ name: 'home' });
 };
 
 const onDeleteAccount = async () => {
