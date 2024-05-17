@@ -1,4 +1,5 @@
 <template>
+  <img class="logo" width="250" src="@/assets/m-log-logo.png" @click="navigateToHome" />
   <div class="register-page">
     <div class="register-header">
       <h1>회원가입</h1>
@@ -68,9 +69,28 @@ const onRegister = async () => {
     message.error('회원가입 실패: ' + error.message);
   }
 };
+const navigateToHome = () => {
+  router.push({ name: 'home' });
+};
+
 </script>
 
 <style scoped>
+.logo {
+  display: block;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+
+.login-form {
+  max-width: 400px;
+  margin: 60px auto 0;
+  padding: 40px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 8px;
+}
+
 .register-page {
   max-width: 600px;
   margin: 50px auto;

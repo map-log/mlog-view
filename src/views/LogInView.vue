@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="logo" width="250" src="@/assets/m-log-logo.png" />
+    <img class="logo" width="250" src="@/assets/m-log-logo.png" @click="navigateToHome" />
     <a-form :model="formState" name="normal_login" class="login-form" @finish="onFinish" @finishFailed="onFinishFailed">
       <a-form-item label="Email" name="principal" :rules="[{ required: true, message: 'Please input your email!' }]">
         <a-input v-model:value="formState.principal">
@@ -70,6 +70,10 @@ const login = async () => {
     getUserInfo();
     router.replace('/');
   }
+};
+
+const navigateToHome = () => {
+  router.push({ name: 'home' });
 };
 
 const navigateToJoin = () => {
