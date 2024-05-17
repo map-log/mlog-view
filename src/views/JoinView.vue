@@ -16,10 +16,8 @@
       <a-form-item label="비밀번호" name="password" rules="[ { required: true, message: '비밀번호를 입력해 주세요!' } ]">
         <a-input type="password" v-model:value="registerData.password" />
       </a-form-item>
-      <a-form-item label="비밀번호 확인" name="confirmPassword" dependencies="password" rules="[
-          { required: true, message: '비밀번호를 확인해 주세요!' },
-          { validator: checkConfirmPassword }
-        ]">
+      <a-form-item label="비밀번호 확인" name="confirmPassword" :validate-status="confirmPasswordStatus"
+        :help="confirmPasswordHelp" rules="[ { required: true, message: '비밀번호를 확인해 주세요!' } ]">
         <a-input type="password" v-model:value="registerData.confirmPassword" />
       </a-form-item>
       <a-form-item>
@@ -32,7 +30,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { useMemberStore } from '@/stores/member';
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
@@ -48,15 +46,21 @@ const registerData = reactive({
   confirmPassword: ''
 });
 
-const checkConfirmPassword = (rule, value) => {
-  if (value !== registerData.password) {
-    return Promise.reject('비밀번호가 일치하지 않습니다!');
-  }
-  return Promise.resolve();
-};
+const confirmPasswordStatus = computed(() => {
+  return registerData.confirmPassword && registerData.password !== registerData.confirmPassword ? 'error' : '';
+});
+
+const confirmPasswordHelp = computed(() => {
+  return registerData.confirmPassword && registerData.password !== registerData.confirmPassword ? '비밀번호가 일치하지 않습니다!' : '';
+});
 
 const onRegister = async () => {
   try {
+    if (registerData.password !== registerData.confirmPassword) {
+      message.error('비밀번호가 일치하지 않습니다!');
+      return;
+    }
+
     await memberStore.registerUser(registerData);
     message.success('회원가입 성공!');
     router.push({ name: 'home' });
