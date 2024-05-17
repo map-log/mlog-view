@@ -25,4 +25,8 @@ async function logout(userid, success, fail) {
   await local.get(`/user/logout/${userid}`).then(success).catch(fail);
 }
 
-export { userConfirm, findById, checkMe, tokenRegeneration, logout };
+async function userRegister(param, success, fail) {
+  await local.post(`/user/join`, param).then(success).catch(fail);
+}
+
+export { userConfirm, findById, checkMe, tokenRegeneration, logout, userRegister };

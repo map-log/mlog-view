@@ -3,7 +3,14 @@ import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 
-import { userConfirm, findById, checkMe, tokenRegeneration, logout } from "@/api/user";
+import {
+  userConfirm,
+  findById,
+  checkMe,
+  tokenRegeneration,
+  logout,
+  userRegister,
+} from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 
 export const useMemberStore = defineStore("memberStore", () => {
@@ -13,6 +20,22 @@ export const useMemberStore = defineStore("memberStore", () => {
   const isLoginError = ref(false);
   const userInfo = ref(null);
   const isValidToken = ref(false);
+
+  const registerUser = async (registerData) => {
+    await userRegister(
+      registerData,
+      (response) => {
+        if (response.status === httpStatusCode.CREATED) {
+          console.log("회원가입 성공!!!!");
+          router.push({ name: "user-login" });
+        }
+      },
+      (error) => {
+        console.log("회원가입 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
 
   const userLogin = async (loginUser) => {
     await userConfirm(
@@ -65,6 +88,7 @@ export const useMemberStore = defineStore("memberStore", () => {
 
   const getUserInfo = async () => {
     await findById(
+      userInfo.value.id,
       (response) => {
         if (response.status === httpStatusCode.OK) {
           console.log(`getUserInfo => ${response.data}`);
@@ -125,25 +149,12 @@ export const useMemberStore = defineStore("memberStore", () => {
   };
 
   const userLogout = async () => {
-    console.log("로그아웃 아이디 : " + userInfo.value.userId);
-    await logout(
-      userInfo.value.userId,
-      (response) => {
-        if (response.status === httpStatusCode.OK) {
-          isLogin.value = false;
-          userInfo.value = null;
-          isValidToken.value = false;
+    console.log("로그아웃 아이디 : " + userInfo.value.id);
+    isLogin.value = false;
+    userInfo.value = null;
+    isValidToken.value = false;
 
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("refreshToken");
-        } else {
-          console.error("유저 정보 없음!!!!");
-        }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    sessionStorage.removeItem("accessToken");
   };
 
   return {
@@ -151,6 +162,7 @@ export const useMemberStore = defineStore("memberStore", () => {
     isLoginError,
     userInfo,
     isValidToken,
+    registerUser,
     userLogin,
     getUserInfo,
     tokenRegenerate,
