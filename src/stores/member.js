@@ -3,7 +3,16 @@ import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 
-import { userConfirm, findById, checkMe, tokenRegeneration, logout } from "@/api/user";
+import {
+  userConfirm,
+  findById,
+  checkMe,
+  tokenRegeneration,
+  logout,
+  userRegister,
+  apiDeleteAccount,
+  apiModifyUserProfile,
+} from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 
 export const useMemberStore = defineStore("memberStore", () => {
@@ -13,6 +22,22 @@ export const useMemberStore = defineStore("memberStore", () => {
   const isLoginError = ref(false);
   const userInfo = ref(null);
   const isValidToken = ref(false);
+
+  const registerUser = async (registerData) => {
+    await userRegister(
+      registerData,
+      (response) => {
+        if (response.status === httpStatusCode.CREATED) {
+          console.log("회원가입 성공!!!!");
+          router.push({ name: "user-login" });
+        }
+      },
+      (error) => {
+        console.log("회원가입 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
 
   const userLogin = async (loginUser) => {
     await userConfirm(
@@ -65,6 +90,7 @@ export const useMemberStore = defineStore("memberStore", () => {
 
   const getUserInfo = async () => {
     await findById(
+      userInfo.value.id,
       (response) => {
         if (response.status === httpStatusCode.OK) {
           console.log(`getUserInfo => ${response.data}`);
@@ -125,7 +151,7 @@ export const useMemberStore = defineStore("memberStore", () => {
   };
 
   const userLogout = async () => {
-    console.log("로그아웃 아이디 : " + userInfo.value.userId);
+    console.log("로그아웃 아이디 : " + userInfo.value.id);
     isLogin.value = false;
     userInfo.value = null;
     isValidToken.value = false;
@@ -133,11 +159,53 @@ export const useMemberStore = defineStore("memberStore", () => {
     sessionStorage.removeItem("accessToken");
   };
 
+  const deleteAccount = async (userid) => {
+    await apiDeleteAccount(
+      userid,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("회원 탈퇴 성공!!!!");
+          isLogin.value = false;
+          userInfo.value = null;
+          isValidToken.value = false;
+          sessionStorage.removeItem("accessToken");
+        }
+      },
+      (error) => {
+        console.log("회원 탈퇴 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
+
+  const modifyUserProfile = async (profileData, userid) => {
+    await apiModifyUserProfile(
+      profileData,
+      userid,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("프로필 수정 성공!!!!:");
+          userInfo.value.id = profileData.id;
+          userInfo.value.name = profileData.name;
+          userInfo.value.email = profileData.email;
+          userInfo.value.password = profileData.password;
+        }
+      },
+      (error) => {
+        console.log("프로필 수정 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
+
   return {
     isLogin,
     isLoginError,
     userInfo,
     isValidToken,
+    deleteAccount,
+    modifyUserProfile,
+    registerUser,
     userLogin,
     getUserInfo,
     tokenRegenerate,
