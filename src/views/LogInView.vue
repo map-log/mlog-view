@@ -10,16 +10,13 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item label="Password" name="credentials" :rules="[{ required: true, message: 'Please input your password!' }]">
+      <a-form-item label="Password" name="credentials"
+        :rules="[{ required: true, message: 'Please input your password!' }]">
         <a-input-password v-model:value="formState.credentials">
           <template #prefix>
             <LockOutlined class="site-form-item-icon" />
           </template>
         </a-input-password>
-      </a-form-item>
-
-      <a-form-item>
-        <a class="login-form-forgot" @click="navigateFindPwd">Forgot password</a>
       </a-form-item>
 
       <a-form-item>
@@ -78,9 +75,7 @@ const login = async () => {
 const navigateToJoin = () => {
   router.push({ name: 'join' });
 };
-const navigateFindPwd = () => {
-  router.push({ name: 'findPwd' });
-};
+
 </script>
 
 <style scoped>

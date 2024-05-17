@@ -25,4 +25,25 @@ async function logout(userid, success, fail) {
   await local.get(`/user/logout/${userid}`).then(success).catch(fail);
 }
 
-export { userConfirm, findById, checkMe, tokenRegeneration, logout };
+async function userRegister(param, success, fail) {
+  await local.post(`/user/join`, param).then(success).catch(fail);
+}
+
+async function apiDeleteAccount(userid, success, fail) {
+  await local.delete(`/user/${userid}`).then(success).catch(fail);
+}
+
+async function apiModifyUserProfile(param, userid, success, fail) {
+  await local.put(`/user/${userid}`, param).then(success).catch(fail);
+}
+
+export {
+  userConfirm,
+  findById,
+  checkMe,
+  tokenRegeneration,
+  logout,
+  userRegister,
+  apiDeleteAccount,
+  apiModifyUserProfile,
+};
