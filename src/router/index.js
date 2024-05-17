@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import LogInView from "@/views/LogInView.vue";
 import UserInfoView from "@/views/UserInfoView.vue";
-import JoinView from "@/views/JoinView.vue"
-import FindPwdView from "@/views/FindPwdView.vue"
+import JoinView from "@/views/JoinView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,11 +26,6 @@ const router = createRouter({
       path: "/join",
       name: "join",
       component: JoinView,
-    },
-    {
-      path: "/findPwd",
-      name: "findPwd",
-      component: FindPwdView,
     },
   ],
 });

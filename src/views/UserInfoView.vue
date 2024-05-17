@@ -25,14 +25,14 @@
         <a-button type="primary" html-type="submit" class="update-button">
           Modify Profile
         </a-button>
+        <a-button type="danger" @click="onDeleteAccount" class="delete-button">
+          Delete Account
+        </a-button>
+        <a-button type="default" @click="goHome" class="home-button">
+          Home
+        </a-button>
       </a-form-item>
     </a-form>
-    <a-button type="default" @click="goHome" class="home-button">
-      Home
-    </a-button>
-    <a-button type="danger" @click="onDeleteAccount" class="delete-button">
-      Delete Account
-    </a-button>
   </div>
 </template>
 
@@ -66,7 +66,7 @@ const onModifyProfile = async () => {
   try {
     await memberStore.modifyUserProfile(userProfile.value, userProfile.value.id);
     message.success('프로필 수정 성공!');
-    console.log(userProfile.value)
+    console.log(userProfile.value);
     router.replace('/');
   } catch (error) {
     message.error('프로필 수정 실패: ' + error.message);
@@ -126,10 +126,8 @@ const onDeleteAccount = async () => {
 }
 
 .delete-button {
-  display: block;
-  margin: 10px auto 0;
-  width: 100%;
   background-color: #ff4d4f;
   color: #fff;
+  margin-left: 10px;
 }
 </style>
