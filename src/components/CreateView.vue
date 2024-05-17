@@ -2,10 +2,10 @@
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
+import { useTravelStore } from '@/stores/travel'
 import GoogleMap from '@/components/Map/GoogleMap.vue'
 
 const form = ref({
-    img: '',
     lat: '',
     lng: '',
     title: '',
@@ -15,7 +15,16 @@ const form = ref({
 });
 
 const rules = {
-    
+    img: [{
+        required: true,
+        message: 'Please enter url description',
+    }
+    ],
+    title: [{
+        required: true,
+        message: 'Please enter url description',
+    }
+    ],
     description: [
         {
             required: true,
@@ -23,6 +32,7 @@ const rules = {
         },
     ],
 };
+
 const open = ref(false);
 const showDrawer = () => {
     open.value = true;
@@ -42,7 +52,6 @@ function getBase64(file) {
 const previewVisible = ref(false);
 const previewImage = ref('');
 const previewTitle = ref('');
-const fileList = ref([]);
 const handleCancel = () => {
     previewVisible.value = false;
     previewTitle.value = '';
@@ -91,18 +100,25 @@ const onChangePosition = (x, y) => {
     console.log(lat.value, lng.value)
 }
 
+const travelStore = useTravelStore();
+const { createTravelLog } = travelStore;
+
+const fileList = ref([]);
+
 const onSave = async () => {
 
-    // 모든 파일을 Base64로 변환
-    const images = await Promise.all(fileList.value.map(async file => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
+    // 첫 번째 파일만 Base64로 변환하여 titleImg에 할당
+    const firstFile = fileList.value[0]; // 첫 번째 파일만 선택
+    const titleImg = ref(null);
+    if (firstFile) {
+        if (!firstFile.url && !firstFile.preview) {
+            firstFile.preview = await getBase64(firstFile.originFileObj);
         }
-        return file.preview; // Base64 데이터 반환
-    }));
+        titleImg.value = firstFile.preview; // 첫 번째 파일의 Base64 이미지를 titleImg에 할당
+    }
 
     // 상세 일정의 각 파일을 Base64로 변환
-    const detailedSchedulesData = await Promise.all(detailedSchedules.value.map(async detail => {
+    const detailedSchedulesData = await Promise.all(detailedSchedules.value.map(async (detail, index) => {
         const detailImages = await Promise.all(detail.fileList.map(async file => {
             if (!file.url && !file.preview) {
                 file.preview = await getBase64(file.originFileObj);
@@ -111,6 +127,7 @@ const onSave = async () => {
         }));
 
         return {
+            seq: index + 1,
             title: detail.title,
             description: detail.description,
             images: detailImages
@@ -118,25 +135,59 @@ const onSave = async () => {
     }));
 
     const travelData = {
-        name: form.name.value,
-        description: form.description.value,
-        images: images,
-        position: {
-            lat: lat.value,
-            lng: lng.value
-        },
-        dateRange: value1.value,
-        rating: value.value,
+        title: form.value.title,
+        description: form.value.description,
+        image: titleImg.value,
+        lat: lat.value,
+        lng: lng.value,
+        startDate: form.value.dateRange[0],
+        endDate: form.value.dateRange[1],
+        rating: form.value.rate,
         detailedSchedules: detailedSchedulesData
     };
 
-    try {
-        await localAxios.post('/travel/save', travelData);
-        message.success('여행 기록이 성공적으로 저장되었습니다.');
-    } catch (error) {
-        message.error('저장 중 오류가 발생했습니다.');
-    }
+    console.log(travelData)
+    await createTravelLog(travelData);
+    onClose();
 };
+
+// const onSave = async () => {
+//     const formData = new FormData();
+
+//     // // 일반 필드 추가
+//     // formData.append('title', form.value.title);
+//     // formData.append('description', form.value.description);
+//     // formData.append('lat', lat.value);
+//     // formData.append('lng', lng.value);
+//     // formData.append('dateRange', form.value.dateRange);
+//     // formData.append('rating', form.value.rate);
+
+//     // 메인 이미지 파일 추가
+//     formData.append('form', form.value)
+//     fileList.value.forEach(file => {
+//         formData.append('image', file.originFileObj);
+//     });
+
+//     // // 상세 일정 데이터 추가
+//     // detailedSchedules.value.forEach((detail, index) => {
+//     //     formData.append(`detailedSchedules[${index}][title]`, detail.title);
+//     //     formData.append(`detailedSchedules[${index}][description]`, detail.description);
+//     //     detail.fileList.forEach(file => {
+//     //         formData.append(`detailedSchedules[${index}][images]`, file.originFileObj);
+//     //     });
+//     // });
+
+//     // formData.append('image', )
+
+//     // FormData의 내용을 확인
+//     for (let [key, value] of formData.entries()) {
+//         console.log(`${key}: ${value}`);
+//     }
+
+//     // API 요청
+//     await createTravelLog(formData);
+//     onClose();
+// };
 
 
 </script>
@@ -178,7 +229,7 @@ const onSave = async () => {
 
         <!-- 일정 추가 -->
         <h3>일정</h3>
-        <a-range-picker :size="large" :placement="bottomRight" v-model:value="form.dateRange" :bordered="false" />
+        <a-range-picker v-model:value="form.dateRange" :bordered="false" />
 
         <h3>별점</h3>
         <a-rate v-model:value="form.rate" allow-half />
@@ -217,7 +268,7 @@ const onSave = async () => {
 
         <template #footer>
             <a-space :size="10">
-                <a-button key="submit" type="primary" :loading="loading" @click="success">완료!!</a-button>
+                <a-button key="submit" type="primary" @click="onSave">완료!!</a-button>
             </a-space>
         </template>
     </a-drawer>

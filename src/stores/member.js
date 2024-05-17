@@ -126,24 +126,11 @@ export const useMemberStore = defineStore("memberStore", () => {
 
   const userLogout = async () => {
     console.log("로그아웃 아이디 : " + userInfo.value.userId);
-    await logout(
-      userInfo.value.userId,
-      (response) => {
-        if (response.status === httpStatusCode.OK) {
-          isLogin.value = false;
-          userInfo.value = null;
-          isValidToken.value = false;
+    isLogin.value = false;
+    userInfo.value = null;
+    isValidToken.value = false;
 
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("refreshToken");
-        } else {
-          console.error("유저 정보 없음!!!!");
-        }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    sessionStorage.removeItem("accessToken");
   };
 
   return {
