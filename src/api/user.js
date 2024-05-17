@@ -29,4 +29,16 @@ async function userRegister(param, success, fail) {
   await local.post(`/user/join`, param).then(success).catch(fail);
 }
 
-export { userConfirm, findById, checkMe, tokenRegeneration, logout, userRegister };
+async function apiDeleteAccount(userid, success, fail) {
+  await local.delete(`/user/${userid}`).then(success).catch(fail);
+}
+
+export {
+  userConfirm,
+  findById,
+  checkMe,
+  tokenRegeneration,
+  logout,
+  userRegister,
+  apiDeleteAccount,
+};

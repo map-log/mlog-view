@@ -21,6 +21,9 @@
     <a-button type="default" @click="goHome" class="home-button">
       Home
     </a-button>
+    <a-button type="danger" @click="onDeleteAccount" class="delete-button">
+      Delete Account
+    </a-button>
   </div>
 </template>
 
@@ -29,14 +32,14 @@ import { ref } from 'vue';
 import { storeToRefs } from "pinia"
 import { useRouter } from "vue-router"
 import { useMemberStore } from "@/stores/member"
+import { message } from 'ant-design-vue';
 
 const router = useRouter();
 const memberStore = useMemberStore();
 const { userInfo } = storeToRefs(memberStore);
 
-// 사용자 정보 예제 데이터
 const userProfile = ref({
-  image: '@/assets/profile.jpg', // 프로필 사진 경로
+  image: '@/assets/profile.jpg',
   name: userInfo.value.name,
   email: userInfo.value.email,
 });
@@ -48,6 +51,16 @@ const onUpdateProfile = () => {
 
 const goHome = () => {
   router.replace("/");
+};
+
+const onDeleteAccount = async () => {
+  try {
+    await memberStore.deleteAccount(userInfo.value.id);
+    message.success('회원 탈퇴 성공!');
+    router.replace("/"); // 탈퇴 후 홈으로 이동
+  } catch (error) {
+    message.error('회원 탈퇴 실패: ' + error.message);
+  }
 };
 </script>
 
@@ -86,5 +99,13 @@ const goHome = () => {
   display: block;
   margin: 20px auto 0;
   width: 100%;
+}
+
+.delete-button {
+  display: block;
+  margin: 10px auto 0;
+  width: 100%;
+  background-color: #ff4d4f;
+  color: #fff;
 }
 </style>

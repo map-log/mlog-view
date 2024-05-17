@@ -10,6 +10,7 @@ import {
   tokenRegeneration,
   logout,
   userRegister,
+  apiDeleteAccount,
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 
@@ -157,11 +158,31 @@ export const useMemberStore = defineStore("memberStore", () => {
     sessionStorage.removeItem("accessToken");
   };
 
+  const deleteAccount = async (userid) => {
+    await apiDeleteAccount(
+      userid,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("회원 탈퇴 성공!!!!");
+          isLogin.value = false;
+          userInfo.value = null;
+          isValidToken.value = false;
+          sessionStorage.removeItem("accessToken");
+        }
+      },
+      (error) => {
+        console.log("회원 탈퇴 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
+
   return {
     isLogin,
     isLoginError,
     userInfo,
     isValidToken,
+    deleteAccount,
     registerUser,
     userLogin,
     getUserInfo,
