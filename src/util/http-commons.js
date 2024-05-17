@@ -87,4 +87,19 @@ function localAxios() {
   return instance;
 }
 
-export { localAxios };
+function travalAxios() {
+  const instance = axios.create({
+    baseURL: VITE_VUE_API_URL,
+  });
+
+  // Request 발생 시 적용할 내용.
+  instance.defaults.headers.common["X-MLOG-AUTH"] = "";
+  // 멀티파트 폼 데이터를 사용하기 위해 Content-Type을 제거합니다.
+  // Axios는 자동으로 적절한 Content-Type을 설정합니다.
+  delete instance.defaults.headers.post["Content-Type"];
+  delete instance.defaults.headers.put["Content-Type"];
+
+  return instance;
+}
+
+export { localAxios, travalAxios };
