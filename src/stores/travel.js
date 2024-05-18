@@ -14,9 +14,7 @@ export const useTravelStore = defineStore("travelStore", () => {
   const { userInfo } = storeToRefs(memberStore);
 
   const createTravelLog = async (travelData) => {
-    console.log(userInfo.value.id);
     await saveTravelLog(
-      userInfo.value.id,
       travelData,
       (response) => {
         if (response.status === httpStatusCode.OK) {
