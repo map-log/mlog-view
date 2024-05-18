@@ -13,4 +13,18 @@ async function checkMe(success, fail) {
   await local.get(`/travel`).then(success).catch(fail);
 }
 
-export { saveTravelLog, checkMe };
+async function getTravelList(success, fail) {
+  local.defaults.headers["X-MLOG-AUTH"] = `Bearer ${sessionStorage.getItem("accessToken")}`;
+  await local.get(`/travel`).then(response => {
+    console.log("API 응답:", response); // 응답 구조 확인
+    success(response);
+  }).catch(fail);
+}
+
+
+async function getTravelDetail(travelId, success, fail) {
+  local.defaults.headers["X-MLOG-AUTH"] = `Bearer ${sessionStorage.getItem("accessToken")}`;
+  await local.get(`/travel/${travelId}`).then(success).catch(fail);
+}
+
+export { saveTravelLog, checkMe, getTravelList, getTravelDetail };

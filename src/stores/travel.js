@@ -1,57 +1,75 @@
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { defineStore } from 'pinia';
-import { saveTravelLog, checkMe } from '@/api/travel';
-import { httpStatusCode } from '@/util/http-status';
-import { useMemberStore } from '@/stores/member';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { defineStore, storeToRefs } from "pinia";
+import { saveTravelLog, getTravelList, getTravelDetail } from "@/api/travel";
+import { httpStatusCode } from "@/util/http-status";
+import { useMemberStore } from "@/stores/member";
 
-export const useTravelStore = defineStore('travelStore', () => {
+export const useTravelStore = defineStore("travelStore", () => {
   const router = useRouter();
 
   const memberStore = useMemberStore();
-  const userInfo = ref(null);
+  const { userInfo } = storeToRefs(memberStore);
+
+  const travelList = ref([]);
+  const travelDetail = ref(null);
 
   const createTravelLog = async (travelData) => {
     await saveTravelLog(
       travelData,
       (response) => {
         if (response.status === httpStatusCode.OK) {
-          console.log('여행 기록 저장 성공');
+          console.log("여행 기록 저장 성공");
         } else {
-          console.log('여행 기록 저장 실패');
+          console.log("여행 기록 저장 실패");
         }
       },
       (error) => {
-        console.error('여행 기록 저장 중 오류 발생:', error);
+        console.error(error);
       }
     );
   };
 
-  const getMeInfo = async () => {
-    await checkMe(
+  const fetchTravelList = async () => {
+    await getTravelList(
       (response) => {
         if (response.status === httpStatusCode.OK) {
-          userInfo.value = response.data.response;
-          console.log('유저 정보:', userInfo.value); // 유저 정보 확인 로그
+          // 응답 데이터 구조에 맞게 travels 리스트 접근
+          console.log("응답 데이터:", response.data);
+          travelList.value = response.data.response.travelList ?? []; // 수정된 경로
+          console.log("여행 리스트:", travelList.value);
         } else {
-          console.log('유저 정보 없음!!!!');
+          console.log("여행 리스트 없음");
         }
       },
-      async (error) => {
-        console.error(
-          '토큰 만료되어 사용 불가능:',
-          error.response.status,
-          error.response.statusText
-        );
-        memberStore.isValidToken.value = false;
-        await memberStore.tokenRegenerate();
+      (error) => {
+        console.error("여행 리스트 가져오기 오류:", error);
+      }
+    );
+  };
+
+  const fetchTravelDetail = async (travelId) => {
+    await getTravelDetail(
+      travelId,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          travelDetail.value = response.data;
+          console.log("여행 상세 정보:", travelDetail.value);
+        } else {
+          console.log("여행 상세 정보 없음");
+        }
+      },
+      (error) => {
+        console.error("여행 상세 정보 가져오기 오류:", error);
       }
     );
   };
 
   return {
     createTravelLog,
-    getMeInfo,
-    userInfo,
+    fetchTravelList,
+    fetchTravelDetail,
+    travelList,
+    travelDetail,
   };
 });
