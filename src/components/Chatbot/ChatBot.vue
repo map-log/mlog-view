@@ -7,7 +7,13 @@
     <div class="chatbot-body">
       <div class="messages">
         <div v-for="message in messages" :key="message.id" :class="['message', message.sender]">
-          <div class="message-content">{{ message.text }}</div>
+          <div v-if="message.sender === 'ai' && isJSON(message.text)" class="message-content">
+            <div v-for="(place, index) in JSON.parse(message.text).recommended_places" :key="place.name" class="place-card">
+              <h3>{{ index + 1 }}. {{ place.name }}</h3>
+              <p>{{ place.category }}</p>
+            </div>
+          </div>
+          <div v-else class="message-content">{{ message.text }}</div>
         </div>
       </div>
     </div>
@@ -48,6 +54,15 @@ const addMessage = (sender, text) => {
 
 const closeChatBot = () => {
   isVisible.value = false;
+};
+
+const isJSON = (str) => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 </script>
 
@@ -162,5 +177,22 @@ const closeChatBot = () => {
 
 .send-button:hover {
   background-color: #6c757d;
+}
+
+.place-card {
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.place-card h3 {
+  margin: 0 0 5px;
+}
+
+.place-card p {
+  margin: 0;
+  color: #666;
 }
 </style>
