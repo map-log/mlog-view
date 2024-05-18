@@ -2,9 +2,9 @@
 import { ref, computed } from 'vue';
 import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
 import TourList from '@/components/Tour/TourList.vue';
-import TravelListItem from '@/components/Travel/TravelListItem.vue';
 import TravelListItemInfo from '@/components/Travel/TravelListItemInfo.vue';
 import TourListItemDetail from '@/components/Tour/TourListItemDetail.vue';
+import TravelList from './Travel/TravelList.vue';
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -103,7 +103,7 @@ const closeTourDetailDrawer = () => {
             </template>
             <a-tabs v-model:activeKey="activeKey">
                 <a-tab-pane key="1" tab="내 여행 기록">
-                    <TravelListItem @itemClick="showItemDetailDrawer" />
+                    <TravelList @itemClick="showItemDetailDrawer" />
                 </a-tab-pane>
                 <a-tab-pane key="2" tab="관광지 정보">
                     <TourList @itemClick="showTourDetailDrawer" />
