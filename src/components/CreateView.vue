@@ -151,44 +151,6 @@ const onSave = async () => {
     onClose();
 };
 
-// const onSave = async () => {
-//     const formData = new FormData();
-
-//     // // 일반 필드 추가
-//     // formData.append('title', form.value.title);
-//     // formData.append('description', form.value.description);
-//     // formData.append('lat', lat.value);
-//     // formData.append('lng', lng.value);
-//     // formData.append('dateRange', form.value.dateRange);
-//     // formData.append('rating', form.value.rate);
-
-//     // 메인 이미지 파일 추가
-//     formData.append('form', form.value)
-//     fileList.value.forEach(file => {
-//         formData.append('image', file.originFileObj);
-//     });
-
-//     // // 상세 일정 데이터 추가
-//     // detailedSchedules.value.forEach((detail, index) => {
-//     //     formData.append(`detailedSchedules[${index}][title]`, detail.title);
-//     //     formData.append(`detailedSchedules[${index}][description]`, detail.description);
-//     //     detail.fileList.forEach(file => {
-//     //         formData.append(`detailedSchedules[${index}][images]`, file.originFileObj);
-//     //     });
-//     // });
-
-//     // formData.append('image', )
-
-//     // FormData의 내용을 확인
-//     for (let [key, value] of formData.entries()) {
-//         console.log(`${key}: ${value}`);
-//     }
-
-//     // API 요청
-//     await createTravelLog(formData);
-//     onClose();
-// };
-
 
 </script>
 
