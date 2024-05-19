@@ -67,12 +67,12 @@ const closeTourDetailDrawer = () => {
       class="secondary-drawer">
       <template #extra>
         <a-button type="text" style="margin-right: 0px" @click="closeItemDetailDrawer">
-          <template #icon>
+          <template #icon">
             <DoubleLeftOutlined />
           </template>
         </a-button>
       </template>
-      <TravelListItemInfo :item="selectedItem" />
+      <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" />
     </a-drawer>
 
     <!-- 관광지 상세 정보 drawer 추가 -->
