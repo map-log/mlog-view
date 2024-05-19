@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { defineStore, storeToRefs } from "pinia";
-import { saveTravelLog, getTravelList, getTravelDetail } from "@/api/travel";
+import { saveTravelLog, getTravelList, getTravelDetail,getPhotoDetail } from "@/api/travel";
 import { httpStatusCode } from "@/util/http-status";
 import { useMemberStore } from "@/stores/member";
 
@@ -13,6 +13,7 @@ export const useTravelStore = defineStore("travelStore", () => {
 
   const travelList = ref([]);
   const travelDetail = ref(null);
+  const photoDetail = ref(null);
 
   const createTravelLog = async (travelData) => {
     await saveTravelLog(
@@ -65,11 +66,32 @@ export const useTravelStore = defineStore("travelStore", () => {
     );
   };
 
+  const fetchPhotoDetail = async (travelId) => {
+    console.log("Fetching photo detail for travelId:", travelId); // 함수 호출 확인
+    await getPhotoDetail(
+      travelId,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          photoDetail.value = response.data;
+          console.log("사진 상세 정보:", photoDetail.value);
+        } else {
+          console.log("사진 상세 정보 없음");
+        }
+      },
+      (error) => {
+        console.error("사진 상세 정보 가져오기 오류:", error);
+      }
+    );
+  };
+  
+
   return {
     createTravelLog,
     fetchTravelList,
     fetchTravelDetail,
+    fetchPhotoDetail,
     travelList,
     travelDetail,
+    photoDetail,
   };
 });
