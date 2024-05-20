@@ -1,29 +1,33 @@
 <template>
-  <div v-if="travelDetail && Object.keys(travelDetail).length">
-    <div class="image-row-wrapper">
-      <button @click="scrollLeft" class="scroll-button left">
-        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
-        </svg>
-      </button>
-      <div class="image-row" ref="imageRow">
-        <div v-for="photo in photos" :key="photo.imageUrl" class="image-col">
-          <div class="photo-card">
-            <img :src="photo.imageUrl ? photo.imageUrl : require('@/assets/m-log-logo.png')" class="photo-image" />
-          </div>
+  <div v-if="travelDetail">
+    <!-- 카드 이미지와 기본 정보 -->
+    <div class="card">
+      <div class="image-container">
+        <img v-if="travelDetail.imageUrl" :src="travelDetail.imageUrl" alt="Main Image" class="main-image" />
+        <img v-else src="@/assets/m-log-logo.png" alt="Main Image" class="main-image" />
+      </div>
+      <div class="card-content">
+        <h2>{{ travelDetail.title }}</h2>
+        <p>{{ travelDetail.description }}</p>
+        <p><strong>Rating:</strong> {{ travelDetail.rating }}</p>
+        <p><strong>Location:</strong> {{ travelDetail.lat }}, {{ travelDetail.lng }}</p>
+        <p><strong>Start Date:</strong> {{ travelDetail.startDate }}</p>
+        <p><strong>End Date:</strong> {{ travelDetail.endDate }}</p>
+      </div>
+    </div>
+
+    <!-- 디테일 정보들 -->
+    <div class="details" v-if="travelDetail.detailedSchedules && travelDetail.detailedSchedules.length">
+      <h3>Details</h3>
+      <div v-for="(detail, index) in travelDetail.detailedSchedules" :key="index" class="detail-item">
+        <div class="image-col">
+          <img v-if="assignedPhotos[index]" :src="assignedPhotos[index]" alt="Detail Image" class="detail-image" />
+        </div>
+        <div class="detail-content">
+          <h4>{{ detail.title }}</h4>
+          <p>{{ detail.description }}</p>
         </div>
       </div>
-      <button @click="scrollRight" class="scroll-button right">
-        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"></path>
-        </svg>
-      </button>
-    </div>
-    <h2>{{ travelDetail.title }}</h2>
-    <p>{{ travelDetail.description }}</p>
-    <div style="margin-top: 16px;">
-      <h3>Details:</h3>
-      <p>ID: {{ travelDetail.id }}</p>
     </div>
   </div>
   <div v-else>
@@ -32,125 +36,136 @@
 </template>
 
 <script setup>
-import { watch, ref } from 'vue';
+import { watch, ref, onMounted } from 'vue';
 import { useTravelStore } from '@/stores/travel';
 
 const props = defineProps({
-  travelDetail: {
-    type: Object,
-    required: false,
-    default: () => ({})
-  },
   travelId: {
     type: Number,
     required: true
   }
 });
 
-const photos = ref([]);
-const imageRow = ref(null);
+const travelDetail = ref(null);
+const photoDetail = ref([]); // 사진 배열을 담을 ref
+const assignedPhotos = ref([]); // 순서대로 할당된 사진 배열
 
 const travelStore = useTravelStore();
 
-const fetchPhotos = async () => {
-  if (props.travelId) {
-    console.log("Fetching photos for travelId:", props.travelId);
-    await travelStore.fetchPhotoDetail(props.travelId);
-    photos.value = travelStore.photoDetail.response.travelPhotoList;
-    console.log("Fetched photos:", photos.value);
+const fetchTravelDetail = async (id) => {
+  if (id !== null && id !== undefined) {
+    try {
+      console.log('Fetching travel detail for id:', id);
+      const { response } = await travelStore.fetchTravelDetail(id);
+      console.log('Travel detail response:', response);
+      travelDetail.value = response;  // 직접 응답 데이터 할당
+      assignPhotosToDetails(); // 사진 할당 함수 호출
+    } catch (error) {
+      console.error('Error fetching travel detail:', error);
+    }
   }
 };
 
-watch(() => props.travelId, (newTravelId) => {
-  console.log('Selected Travel ID:', newTravelId);
-  fetchPhotos();
-}, { immediate: true });
-
-watch(() => props.travelDetail, (newDetail) => {
-  console.log('Selected Travel Detail:', newDetail);
-}, { immediate: true });
-
-const scrollLeft = () => {
-  if (imageRow.value) {
-    imageRow.value.scrollBy({ left: -200, behavior: 'smooth' });
+const fetchPhotoDetail = async (id) => {
+  if (id !== null && id !== undefined) {
+    try {
+      console.log('Fetching photo detail for id:', id);
+      const { response } = await travelStore.fetchPhotoDetail(id);
+      console.log('Photo detail response:', response);
+      photoDetail.value = response.travelPhotoList; // 사진 데이터를 배열로 저장
+      assignPhotosToDetails(); // 사진 할당 함수 호출
+    } catch (error) {
+      console.error('Error fetching photo detail:', error);
+    }
   }
 };
 
-const scrollRight = () => {
-  if (imageRow.value) {
-    imageRow.value.scrollBy({ left: 200, behavior: 'smooth' });
+const assignPhotosToDetails = () => {
+  assignedPhotos.value = [];
+  let photoIndex = 0;
+
+  if (travelDetail.value && travelDetail.value.detailedSchedules) {
+    travelDetail.value.detailedSchedules.forEach((detail, index) => {
+      if (photoDetail.value.length > photoIndex) {
+        assignedPhotos.value[index] = photoDetail.value[photoIndex].imageUrl;
+        photoIndex++;
+      } else {
+        assignedPhotos.value[index] = null; // 할당할 사진이 없을 경우
+      }
+    });
   }
 };
+
+onMounted(() => {
+  fetchTravelDetail(props.travelId);
+  fetchPhotoDetail(props.travelId);
+});
+
+watch(() => props.travelId, (newId) => {
+  fetchTravelDetail(newId);
+  fetchPhotoDetail(newId);
+});
 </script>
 
 <style scoped>
-.image-row-wrapper {
+.card {
   display: flex;
-  align-items: center;
-  position: relative;
+  flex-direction: column;
+  /* 이미지와 내용을 위아래로 정렬 */
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.image-row {
+.image-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.main-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.details {
+  margin-top: 20px;
+}
+
+.detail-item {
   display: flex;
-  overflow-x: hidden; /* 스크롤바 숨기기 */
-  gap: 16px;
-  padding: 8px; /* 스크롤바와 이미지가 겹치지 않도록 여백을 추가합니다 */
-  scroll-behavior: smooth;
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .image-col {
-  flex: 0 0 auto;
-  width: 200px;
+  flex-shrink: 0;
+  /* 이미지 크기 고정 */
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+  /* 이미지와 내용 사이 여백 */
 }
 
-.photo-card {
-  width: 100%;
-  height: 200px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.photo-image {
+.detail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px;
 }
 
-.scroll-button {
-  background: #f0f0f0;
-  border: none;
-  color: #333;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  border-radius: 50%; /* 둥근 모서리 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 약간의 그림자 */
-  transition: background 0.3s, transform 0.3s; /* 배경색과 변환 효과 */
-}
-
-.scroll-button:hover {
-  background: #e0e0e0; /* 호버 시 배경색 */
-  transform: translateY(-50%) scale(1.1); /* 호버 시 확대 효과 */
-}
-
-.scroll-button svg {
-  width: 24px;
-  height: 24px;
-}
-
-.scroll-button.left {
-  left: 8px; /* 위치 조정 */
-}
-
-.scroll-button.right {
-  right: 8px; /* 위치 조정 */
+.detail-content {
+  flex: 1;
+  /* 내용이 남은 공간을 차지 */
 }
 </style>
