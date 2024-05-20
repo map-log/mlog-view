@@ -1,43 +1,64 @@
 <template>
   <div v-if="travelDetail">
-    <!-- 카드 이미지와 기본 정보 -->
-    <div class="card">
-      <div class="image-container">
-        <img v-if="travelDetail.imageUrl" :src="travelDetail.imageUrl" alt="Main Image" class="main-image" />
-        <img v-else src="@/assets/m-log-logo.png" alt="Main Image" class="main-image" />
-      </div>
-      <div class="card-content">
-        <h2>{{ travelDetail.title }}</h2>
-        <p>{{ travelDetail.description }}</p>
-        <p><strong>Rating:</strong> {{ travelDetail.rating }}</p>
-        <p><strong>Location:</strong> {{ travelDetail.lat }}, {{ travelDetail.lng }}</p>
-        <p><strong>Start Date:</strong> {{ travelDetail.startDate }}</p>
-        <p><strong>End Date:</strong> {{ travelDetail.endDate }}</p>
-      </div>
-    </div>
+    <!-- 여행 기록 추가 form -->
+    <div class="travel-detail">
 
-    <!-- 디테일 정보들 -->
-    <div class="details" v-if="travelDetail.detailedSchedules && travelDetail.detailedSchedules.length">
-      <h3>Details</h3>
-      <div v-for="(detail, index) in travelDetail.detailedSchedules" :key="index" class="detail-item">
-        <div class="image-col">
-          <img v-if="assignedPhotos[index]" :src="assignedPhotos[index]" alt="Detail Image" class="detail-image" />
+      <!-- 사진 추가 -->
+      <h3>사진</h3>
+      <div class="photo-container">
+        <div class="photo-scroll">
+          <img v-for="(photo, index) in photoDetail" :key="index" :src="photo.imageUrl" alt="Uploaded Image" class="uploaded-image" />
         </div>
-        <div class="detail-content">
-          <h4>{{ detail.title }}</h4>
-          <p>{{ detail.description }}</p>
+      </div>
+
+      <h3>위치</h3>
+      <GoogleMap @change-position="onChangePosition" />
+
+      <h3>제목</h3>
+      <a-input v-model:value="travelDetail.title" placeholder="나의 행복한 여행..." class="input-title" readonly />
+
+      <h3>일정</h3>
+      <a-range-picker v-model:value="dateRange" class="date-picker" readonly />
+
+      <h3>별점</h3>
+      <a-rate v-model:value="travelDetail.rating" class="rating" disabled />
+
+      <h3>한줄평!</h3>
+      <a-textarea v-model:value="travelDetail.description" placeholder="여행을 설명해주세요..." class="input-description" rows="4" readonly />
+
+      <div class="wavy"></div>
+
+      <div v-for="(detail, index) in travelDetail.detailedSchedules" :key="index" class="detail-schedule">
+        <a-flex justify="space-between" align="center">
+          <h2>{{ index + 1 }}.</h2>
+        </a-flex>
+
+        <h3>제목</h3>
+        <p>{{ detail.title }}</p>
+
+        <h3>사진</h3>
+        <div class="photo-container">
+          <div class="photo-scroll">
+            <img v-if="assignedPhotos[index]" :src="assignedPhotos[index]" alt="Detail Image" class="detail-image" />
+          </div>
         </div>
+
+        <h3>설명</h3>
+        <p>{{ detail.description }}</p>
+        <div class="wavy"></div>
       </div>
     </div>
   </div>
   <div v-else>
-    <p>항목이 선택되지 않았습니다.</p>
+    <p>로딩 중...</p>
   </div>
 </template>
 
 <script setup>
-import { watch, ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useTravelStore } from '@/stores/travel';
+import GoogleMap from '@/components/Map/GoogleMap.vue';
+import moment from 'moment';
 
 const props = defineProps({
   travelId: {
@@ -47,19 +68,20 @@ const props = defineProps({
 });
 
 const travelDetail = ref(null);
-const photoDetail = ref([]); // 사진 배열을 담을 ref
-const assignedPhotos = ref([]); // 순서대로 할당된 사진 배열
+const photoDetail = ref([]);
+const dateRange = ref([]);
+const assignedPhotos = ref([]);
 
 const travelStore = useTravelStore();
 
 const fetchTravelDetail = async (id) => {
   if (id !== null && id !== undefined) {
     try {
-      console.log('Fetching travel detail for id:', id);
       const { response } = await travelStore.fetchTravelDetail(id);
-      console.log('Travel detail response:', response);
-      travelDetail.value = response;  // 직접 응답 데이터 할당
-      assignPhotosToDetails(); // 사진 할당 함수 호출
+      travelDetail.value = response;
+      dateRange.value = [moment(response.startDate), moment(response.endDate)];
+      await fetchPhotoDetail(id);  // 여기에 await 추가
+      assignPhotosToDetails();
     } catch (error) {
       console.error('Error fetching travel detail:', error);
     }
@@ -101,6 +123,17 @@ onMounted(() => {
   fetchPhotoDetail(props.travelId);
 });
 
+const onChangePosition = (x, y) => {
+  console.log(x, y);
+};
+
+watch(dateRange, (newDateRange) => {
+  if (newDateRange.length === 2) {
+    travelDetail.value.startDate = newDateRange[0].format();
+    travelDetail.value.endDate = newDateRange[1].format();
+  }
+});
+
 watch(() => props.travelId, (newId) => {
   fetchTravelDetail(newId);
   fetchPhotoDetail(newId);
@@ -108,64 +141,50 @@ watch(() => props.travelId, (newId) => {
 </script>
 
 <style scoped>
-.card {
-  display: flex;
-  flex-direction: column;
-  /* 이미지와 내용을 위아래로 정렬 */
-  margin-bottom: 20px;
-  padding: 20px;
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.photo-container {
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-.image-container {
-  width: 100%;
-  margin-bottom: 20px;
+.photo-scroll {
+  display: inline-flex;
 }
 
-.main-image {
-  width: 100%;
-  height: auto;
+.uploaded-image {
+  height: 200px;
   object-fit: cover;
   border-radius: 8px;
+  margin-right: 10px;
 }
 
-.card-content {
-  flex: 1;
-}
-
-.details {
-  margin-top: 20px;
-}
-
-.detail-item {
-  display: flex;
+.detail-schedule {
   margin-bottom: 20px;
-  padding: 20px;
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.image-col {
-  flex-shrink: 0;
-  /* 이미지 크기 고정 */
-  width: 100px;
-  height: 100px;
-  margin-right: 20px;
-  /* 이미지와 내용 사이 여백 */
 }
 
 .detail-image {
-  width: 100%;
-  height: 100%;
+  height: 100px;
   object-fit: cover;
   border-radius: 8px;
+  margin-right: 10px;
 }
 
-.detail-content {
-  flex: 1;
-  /* 내용이 남은 공간을 차지 */
+.wavy {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  overflow: hidden;
+}
+
+.wavy::before {
+  content: 'aaaaaaaaaaaaaaaaaaaaaa';
+  position: absolute;
+  top: -42px;
+  left: 0;
+  font-size: 4em;
+  color: transparent;
+  text-decoration-style: wavy;
+  text-decoration-color: #858585;
+  text-decoration-line: underline;
+  animation: animate 2s linear infinite;
 }
 </style>

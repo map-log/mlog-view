@@ -67,7 +67,7 @@ const closeTourDetailDrawer = () => {
       class="secondary-drawer">
       <template #extra>
         <a-button type="text" style="margin-right: 0px" @click="closeItemDetailDrawer">
-          <template #icon">
+          <template #icon>
             <DoubleLeftOutlined />
           </template>
         </a-button>
