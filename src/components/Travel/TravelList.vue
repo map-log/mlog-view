@@ -16,12 +16,16 @@ const props = defineProps({
 onMounted(async () => {
   await store.fetchTravelList();
 });
+
+const handleItemClick = (item) => {
+  props.showItemDetailDrawer(item);
+};
 </script>
 
 <template>
   <div>
     <div v-for="travel in travelList" :key="travel.id">
-      <TravelListItem :travel="travel" @itemClick="showItemDetailDrawer" />
+      <TravelListItem :travel="travel" @itemClick="handleItemClick" />
     </div>
   </div>
 </template>
