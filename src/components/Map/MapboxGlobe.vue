@@ -4,6 +4,23 @@ import { useMapStore } from "@/stores/map";
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { storeToRefs } from "pinia";
+import eiffelTower from '@/assets/eiffel_tower.png';
+import tokyoTower from '@/assets/tokyo_tower.png';
+import statueOfLiberty from '@/assets/statue_of_liberty.png';
+import bigBen from '@/assets/big_ben.png';
+import colosseum from '@/assets/colosseum.png';
+import greatWall from '@/assets/great_wall.png';
+import christRedeemer from '@/assets/christ_redeemer.png';
+import sydneyOperaHouse from '@/assets/sydney_opera_house.png';
+import tajMahal from '@/assets/taj_mahal.png';
+import nSeoulTower from '@/assets/n_seoul_tower.png';
+import pyramids from '@/assets/pyramids.png';
+import saintBasilsCathedral from '@/assets/saint_basils_cathedral.png';
+import hagiaSophia from '@/assets/hagia_sophia.png';
+import brandenburgGate from '@/assets/brandenburg_gate.png';
+import sagradaFamilia from '@/assets/sagrada_familia.png';
+import grandPalace from '@/assets/grand_palace.png';
+
 const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
 
 mapboxgl.accessToken = VITE_MAPBOX_ACCESSTOKEN;
@@ -91,6 +108,7 @@ onMounted(() => {
         spinGlobe(window.map);
     });
 
+    setDefaultMarkers();
     printMarker(window.map);
 });
 
@@ -99,6 +117,28 @@ const { markerList } = storeToRefs(mapStore);
 const watchMarker = watch(markerList, () => {
     printMarker(window.map);
 });
+
+const setDefaultMarkers = () => {
+    const defaultMarkers = [
+        { coordinates: [2.2945, 48.8584], img: eiffelTower },
+        { coordinates: [139.8107, 35.6586], img: tokyoTower },
+        { coordinates: [-74.0445, 40.6892], img: statueOfLiberty },
+        { coordinates: [-0.1246, 51.5007], img: bigBen },
+        { coordinates: [12.4924, 41.8902], img: colosseum },
+        { coordinates: [116.5704, 40.4319], img: greatWall },
+        { coordinates: [-43.2105, -22.9519], img: christRedeemer },
+        { coordinates: [151.2153, -33.857], img: sydneyOperaHouse },
+        { coordinates: [78.0421, 27.1751], img: tajMahal },
+        { coordinates: [126.9882, 37.5512], img: nSeoulTower },
+        { coordinates: [31.1342, 29.9792], img: pyramids },
+        { coordinates: [37.6204, 55.7525], img: saintBasilsCathedral },
+        { coordinates: [28.9795, 41.0086], img: hagiaSophia },
+        { coordinates: [13.3777, 52.5163], img: brandenburgGate },
+        { coordinates: [2.1744, 41.4036], img: sagradaFamilia },
+        { coordinates: [100.4928, 13.7525], img: grandPalace }
+    ];
+    mapStore.markerList.push(...defaultMarkers);
+};
 
 const printMarker = (map) => {
     // 기존 마커 제거
