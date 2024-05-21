@@ -4,6 +4,23 @@ import { useMapStore } from "@/stores/map";
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { storeToRefs } from "pinia";
+import eiffelTower from '@/assets/eiffel_tower.png';
+import tokyoTower from '@/assets/tokyo_tower.png';
+import statueOfLiberty from '@/assets/statue_of_liberty.png';
+import bigBen from '@/assets/big_ben.png';
+import colosseum from '@/assets/colosseum.png';
+import greatWall from '@/assets/great_wall.png';
+import christRedeemer from '@/assets/christ_redeemer.png';
+import sydneyOperaHouse from '@/assets/sydney_opera_house.png';
+import tajMahal from '@/assets/taj_mahal.png';
+import nSeoulTower from '@/assets/n_seoul_tower.png';
+import pyramids from '@/assets/pyramids.png';
+import saintBasilsCathedral from '@/assets/saint_basils_cathedral.png';
+import hagiaSophia from '@/assets/hagia_sophia.png';
+import brandenburgGate from '@/assets/brandenburg_gate.png';
+import sagradaFamilia from '@/assets/sagrada_familia.png';
+import grandPalace from '@/assets/grand_palace.png';
+
 const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
 
 mapboxgl.accessToken = VITE_MAPBOX_ACCESSTOKEN;
@@ -91,6 +108,7 @@ onMounted(() => {
         spinGlobe(window.map);
     });
 
+    setDefaultMarkers();
     printMarker(window.map);
 });
 
@@ -99,6 +117,28 @@ const { markerList } = storeToRefs(mapStore);
 const watchMarker = watch(markerList, () => {
     printMarker(window.map);
 });
+
+const setDefaultMarkers = () => {
+    const defaultMarkers = [
+        { coordinates: [2.2945, 48.8584], img: eiffelTower, name: "Eiffel Tower" },
+        { coordinates: [139.8107, 35.6586], img: tokyoTower, name: "Tokyo Tower" },
+        { coordinates: [-74.0445, 40.6892], img: statueOfLiberty, name: "Statue of Liberty" },
+        { coordinates: [-0.1246, 51.5007], img: bigBen, name: "Big Ben" },
+        { coordinates: [12.4924, 41.8902], img: colosseum, name: "Colosseum" },
+        { coordinates: [116.5704, 40.4319], img: greatWall, name: "Great Wall of China" },
+        { coordinates: [-43.2105, -22.9519], img: christRedeemer, name: "Christ the Redeemer" },
+        { coordinates: [151.2153, -33.857], img: sydneyOperaHouse, name: "Sydney Opera House" },
+        { coordinates: [78.0421, 27.1751], img: tajMahal, name: "Taj Mahal" },
+        { coordinates: [126.9882, 37.5512], img: nSeoulTower, name: "N Seoul Tower" },
+        { coordinates: [31.1342, 29.9792], img: pyramids, name: "Pyramids of Giza" },
+        { coordinates: [37.6204, 55.7525], img: saintBasilsCathedral, name: "Saint Basil's Cathedral" },
+        { coordinates: [28.9795, 41.0086], img: hagiaSophia, name: "Hagia Sophia" },
+        { coordinates: [13.3777, 52.5163], img: brandenburgGate, name: "Brandenburg Gate" },
+        { coordinates: [2.1744, 41.4036], img: sagradaFamilia, name: "Sagrada Familia" },
+        { coordinates: [100.4928, 13.7525], img: grandPalace, name: "Grand Palace" }
+    ];
+    mapStore.markerList.push(...defaultMarkers);
+};
 
 const printMarker = (map) => {
     // 기존 마커 제거
@@ -113,12 +153,15 @@ const printMarker = (map) => {
         el.style.height = `60px`;
         el.style.backgroundSize = '100%';
 
-        const popup = new mapboxgl.Popup({ offset: 50 })
-            .setHTML('<h1>Hello World!</h1>');
+        let popup;
+        if (marker.name) {
+            popup = new mapboxgl.Popup({ offset: 50 })
+                .setHTML(`<h1>${marker.name}</h1>`);
+        }
 
         const newMarker = new mapboxgl.Marker(el)
             .setLngLat(marker.coordinates)
-            .setPopup(popup)
+            .setPopup(popup || null)
             .addTo(map);
 
         el.addEventListener('click', () => {
