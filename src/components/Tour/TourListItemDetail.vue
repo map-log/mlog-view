@@ -1,12 +1,12 @@
 <template>
   <div v-if="item && Object.keys(item).length">
-    <a-image-preview-group>
-      <a-image v-if="item.firstimage" :width="200" :src="item.firstimage" />
-      <a-image v-else-if="item.firstimage2" :width="200" :src="item.firstimage2" />
-      <a-image v-else :width="200" src="@/assets/m-log-logo.png" />
-    </a-image-preview-group>
+    <div class="image-container">
+      <img v-if="item.firstimage" :src="item.firstimage" alt="First Image" />
+      <img v-else-if="item.firstimage2" :src="item.firstimage2" alt="Second Image" />
+      <img v-else src="@/assets/m-log-logo.png" alt="Default Logo" />
+    </div>
     <h2>{{ item.title }}</h2>
-    <div style="height: 400px; width: 100%; margin-top: 16px;">
+    <div class="map-container">
       <GoogleMap :lat="item.mapy" :lng="item.mapx" />
     </div>
   </div>
@@ -34,4 +34,24 @@ watch(() => props.item, (newItem) => {
 }, { immediate: true });
 </script>
 
-<style scoped></style>
+<style scoped>
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.image-container img {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.map-container {
+  height: 400px;
+  width: 100%;
+  margin-top: 16px;
+}
+</style>

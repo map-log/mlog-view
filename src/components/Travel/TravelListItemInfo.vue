@@ -10,7 +10,7 @@
       </div>
 
       <h3>위치</h3>
-      <GoogleMap :lat="travelDetail.latitude" :lng="travelDetail.longitude" @changePosition="onChangePosition" />
+      <GoogleMap :lat="travelDetail.lat" :lng="travelDetail.lng" @changePosition="onChangePosition" />
 
       <h3>제목</h3>
       <a-input v-model:value="travelDetail.title" placeholder="나의 행복한 여행..." class="input-title" readonly />
