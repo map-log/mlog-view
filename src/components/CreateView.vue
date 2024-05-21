@@ -172,7 +172,7 @@ const onSave = async () => {
         <h3>사진</h3>
         <div class="clearfix">
             <a-upload v-model:file-list="fileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                list-type="picture-card" @preview="handlePreview">
+                list-type="picture-card" @preview="handlePreview" accept="image/*">
                 <div v-if="fileList.length < 1">
                     <plus-outlined />
                     <div style="margin-top: 8px">Upload</div>
@@ -212,7 +212,7 @@ const onSave = async () => {
 
             <h3>사진</h3>
             <a-upload list-type="picture-card" v-model:file-list="detail.fileList"
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76" @preview="handlePreview">
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76" @preview="handlePreview" accept="image/*">
                 <div v-if="detail.fileList.length < 3">
                     <plus-outlined />
                     <div style="margin-top: 8px">사진 추가</div>
