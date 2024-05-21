@@ -18,26 +18,4 @@ defineProps({
   </a-card>
 </template>
 
-<style>
-.search-input {
-  padding: 10px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.search-input:focus {
-  border-color: #007bff;
-}
-
-a-space.horizontal {
-  display: flex;
-  align-items: center;
-}
-
-a-button[type="primary"] {
-  margin-left: 10px;
-}
-</style>
+<style></style>

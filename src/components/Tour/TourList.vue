@@ -63,11 +63,8 @@ const find = (latitude, longitude) => {
         window.map.flyTo({
             center: [longitude, latitude], // 위도와 경도 순서 변경
             essential: true,
-            zoom: 14,
+            zoom: 9,
         });
-
-        const marker = createMarker(latitude, longitude, '');
-        mapStore.markerList = [marker];
     }
 };
 </script>
@@ -80,7 +77,7 @@ const find = (latitude, longitude) => {
         </a-space>
         <a-space direction="vertical" :size="10" style="width: 100%">
             <TourListItem v-for="station in tripStation" :key="station.contentid" :station="station"
-                @click="find(station.mapy, station.mapx)" @itemClick="itemClick(station)" />
+                @click="find(station.mapy, station.mapx, station.firstimage)" @itemClick="itemClick(station)" />
         </a-space>
     </a-space>
 </template>

@@ -27,10 +27,6 @@ const drawerWidth = computed(() => {
   return detailOpen.value ? 800 : 400;
 });
 
-const openDetail = () => {
-  detailOpen.value = !detailOpen.value;
-};
-
 const mapStore = useMapStore();
 const store = useTravelStore();
 const { travelList } = storeToRefs(store);
@@ -74,13 +70,7 @@ const addTravelMarkers = () => {
 
 // TourList의 마커 추가 함수
 const addTourMarkers = () => {
-  // 예시: 관광지 데이터를 가져와서 마커를 추가하는 로직을 작성합니다.
-  // 이 부분은 실제 구현에 맞게 수정해야 합니다.
   resetMarkers();
-  // 예시 데이터 사용
-  const tourData = []; // 실제 데이터로 교체 필요
-  const markers = tourData.map(tour => createMarker(tour.lat, tour.lng, tour.imageUrl));
-  mapStore.markerList = markers;
 };
 
 // watch를 사용하여 activeKey를 감시하고 탭 변경 시 마커 설정
