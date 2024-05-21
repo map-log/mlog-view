@@ -17,6 +17,8 @@ let userInteracting = false;
 let spinEnabled = true;
 let zoomTimer = null;
 
+let currentMarkers = [];
+
 // 전역 변수를 window 객체에 추가하여 어디서든 접근 가능하도록 설정
 window.map = null;
 
@@ -99,6 +101,10 @@ const watchMarker = watch(markerList, () => {
 });
 
 const printMarker = (map) => {
+    // 기존 마커 제거
+    currentMarkers.forEach(marker => marker.remove());
+    currentMarkers = [];
+
     for (const marker of mapStore.markerList) {
         const el = document.createElement('div');
         el.className = 'marker';
@@ -110,7 +116,7 @@ const printMarker = (map) => {
         const popup = new mapboxgl.Popup({ offset: 50 })
             .setHTML('<h1>Hello World!</h1>');
 
-        new mapboxgl.Marker(el)
+        const newMarker = new mapboxgl.Marker(el)
             .setLngLat(marker.coordinates)
             .setPopup(popup)
             .addTo(map);
@@ -118,6 +124,8 @@ const printMarker = (map) => {
         el.addEventListener('click', () => {
             map.easeTo({ center: marker.coordinates, duration: 1000 });
         });
+
+        currentMarkers.push(newMarker);
     }
 };
 </script>

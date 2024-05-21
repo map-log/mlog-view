@@ -1,10 +1,13 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
 import TourList from '@/components/Tour/TourList.vue';
 import TravelListItemInfo from '@/components/Travel/TravelListItemInfo.vue';
 import TourListItemDetail from '@/components/Tour/TourListItemDetail.vue';
 import TravelList from './Travel/TravelList.vue';
+import { useMapStore } from '@/stores/map';
+import { storeToRefs } from 'pinia';
+import { useTravelStore } from '@/stores/travel';
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -27,6 +30,10 @@ const drawerWidth = computed(() => {
 const openDetail = () => {
   detailOpen.value = !detailOpen.value;
 };
+
+const mapStore = useMapStore();
+const store = useTravelStore();
+const { travelList } = storeToRefs(store);
 
 // 새로운 drawer 관련 상태 및 메서드
 const itemDetailOpen = ref(false);
@@ -52,6 +59,54 @@ const closeTourDetailDrawer = () => {
   tourDetailOpen.value = false;
   selectedTourItem.value = null;
 };
+
+// 마커 초기화 함수
+const resetMarkers = () => {
+  mapStore.reset();
+};
+
+// TravelList의 마커 추가 함수
+const addTravelMarkers = () => {
+  resetMarkers();
+  const markers = travelList.value.map(travel => createMarker(travel.lat, travel.lng, travel.imageUrl));
+  mapStore.markerList = markers;
+};
+
+// TourList의 마커 추가 함수
+const addTourMarkers = () => {
+  // 예시: 관광지 데이터를 가져와서 마커를 추가하는 로직을 작성합니다.
+  // 이 부분은 실제 구현에 맞게 수정해야 합니다.
+  resetMarkers();
+  // 예시 데이터 사용
+  const tourData = []; // 실제 데이터로 교체 필요
+  const markers = tourData.map(tour => createMarker(tour.lat, tour.lng, tour.imageUrl));
+  mapStore.markerList = markers;
+};
+
+// watch를 사용하여 activeKey를 감시하고 탭 변경 시 마커 설정
+watch(activeKey, (newKey) => {
+  if (newKey === '1') {
+    addTravelMarkers();
+  } else if (newKey === '2') {
+    addTourMarkers();
+  }
+});
+
+// 초기 마커 설정
+onMounted(() => {
+  if (activeKey.value === '1') {
+    addTravelMarkers();
+  } else if (activeKey.value === '2') {
+    addTourMarkers();
+  }
+});
+
+const createMarker = (latitude, longitude, img) => {
+  return {
+    img: img,
+    coordinates: [longitude, latitude],
+  };
+};
 </script>
 
 <template>
@@ -76,8 +131,8 @@ const closeTourDetailDrawer = () => {
     </a-drawer>
 
     <!-- 관광지 상세 정보 drawer 추가 -->
-    <a-drawer title="관광지 상세 정보" :placement="'left'" :width="400" :open="tourDetailOpen" :mask="false"
-      :closable="false" class="secondary-drawer">
+    <a-drawer title="관광지 상세 정보" :placement="'left'" :width="400" :open="tourDetailOpen" :mask="false" :closable="false"
+      class="secondary-drawer">
       <template #extra>
         <a-button type="text" style="margin-right: 0px" @click="closeTourDetailDrawer">
           <template #icon>
@@ -99,7 +154,8 @@ const closeTourDetailDrawer = () => {
       </template>
       <a-tabs v-model:activeKey="activeKey">
         <a-tab-pane key="1" tab="내 여행 기록">
-          <TravelList :selectedItem="selectedItem" :itemDetailOpen="itemDetailOpen" :showItemDetailDrawer="showItemDetailDrawer" />
+          <TravelList :selectedItem="selectedItem" :itemDetailOpen="itemDetailOpen"
+            :showItemDetailDrawer="showItemDetailDrawer" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="관광지 정보">
           <TourList @itemClick="showTourDetailDrawer" />
