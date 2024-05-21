@@ -10,11 +10,7 @@
       </div>
 
       <h3>위치</h3>
-      <GoogleMap 
-        :lat="travelDetail.latitude" 
-        :lng="travelDetail.longitude" 
-        @changePosition="onChangePosition" 
-      />
+      <GoogleMap :lat="travelDetail.latitude" :lng="travelDetail.longitude" @changePosition="onChangePosition" />
 
       <h3>제목</h3>
       <a-input v-model:value="travelDetail.title" placeholder="나의 행복한 여행..." class="input-title" readonly />
@@ -26,7 +22,8 @@
       <a-rate v-model:value="travelDetail.rating" class="rating" disabled />
 
       <h3>한줄평!</h3>
-      <a-textarea v-model:value="travelDetail.description" placeholder="여행을 설명해주세요..." class="input-description" rows="4" readonly />
+      <a-textarea v-model:value="travelDetail.description" placeholder="여행을 설명해주세요..." class="input-description"
+        rows="4" readonly />
 
       <div class="wavy"></div>
 
@@ -42,7 +39,8 @@
         <div class="clearfix image-container">
           <button @click="scrollLeft(index)" class="scroll-button left">&#9664;</button>
           <div ref="imageContainer" class="image-wrapper">
-            <img v-for="(photo, photoIndex) in assignedPhotos[index]" :key="photoIndex" :src="photo" alt="Detail Image" class="detail-image" />
+            <img v-for="(photo, photoIndex) in detail.photos" :key="photoIndex" :src="photo.imageUrl" alt="Detail Image"
+              class="detail-image" />
           </div>
           <button @click="scrollRight(index)" class="scroll-button right">&#9654;</button>
         </div>
@@ -71,9 +69,7 @@ const props = defineProps({
 });
 
 const travelDetail = ref(null);
-const photoDetail = ref([]);
 const dateRange = ref([]);
-const assignedPhotos = ref([]);
 const imageContainerRefs = ref([]);
 
 const travelStore = useTravelStore();
@@ -83,47 +79,15 @@ const fetchTravelDetail = async (id) => {
     try {
       const { response } = await travelStore.fetchTravelDetail(id);
       travelDetail.value = response;
+      console.log(response);
       dateRange.value = [moment(response.startDate), moment(response.endDate)];
-      await fetchPhotoDetail(id);  // 여기에 await 추가
-      assignPhotosToDetails();
+      nextTick(() => {
+        imageContainerRefs.value = document.querySelectorAll('.image-wrapper');
+      });
     } catch (error) {
       console.error('Error fetching travel detail:', error);
     }
   }
-};
-
-const fetchPhotoDetail = async (id) => {
-  if (id !== null && id !== undefined) {
-    try {
-      console.log('Fetching photo detail for id:', id);
-      const { response } = await travelStore.fetchPhotoDetail(id);
-      console.log('Photo detail response:', response);
-      photoDetail.value = response.travelPhotoList; // 사진 데이터를 배열로 저장
-      assignPhotosToDetails(); // 사진 할당 함수 호출
-    } catch (error) {
-      console.error('Error fetching photo detail:', error);
-    }
-  }
-};
-
-const assignPhotosToDetails = () => {
-  assignedPhotos.value = [];
-  let photoIndex = 0;
-
-  if (travelDetail.value && travelDetail.value.detailedSchedules) {
-    travelDetail.value.detailedSchedules.forEach((detail, index) => {
-      assignedPhotos.value[index] = [];
-      while (photoDetail.value.length > photoIndex) {
-        assignedPhotos.value[index].push(photoDetail.value[photoIndex].imageUrl);
-        photoIndex++;
-      }
-    });
-  }
-
-  // 이미지 컨테이너 참조 배열 초기화
-  nextTick(() => {
-    imageContainerRefs.value = document.querySelectorAll('.image-wrapper');
-  });
 };
 
 const scrollLeft = (index) => {
@@ -146,7 +110,6 @@ const scrollRight = (index) => {
 
 onMounted(() => {
   fetchTravelDetail(props.travelId);
-  fetchPhotoDetail(props.travelId);
 });
 
 const onChangePosition = (lat, lng) => {
@@ -162,7 +125,6 @@ watch(dateRange, (newDateRange) => {
 
 watch(() => props.travelId, (newId) => {
   fetchTravelDetail(newId);
-  fetchPhotoDetail(newId);
 });
 </script>
 
@@ -182,6 +144,7 @@ watch(() => props.travelId, (newId) => {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -207,7 +170,9 @@ h3 {
   transform: scale(1.05);
 }
 
-.input-title, .date-picker, .input-description {
+.input-title,
+.date-picker,
+.input-description {
   width: 100%;
   margin-bottom: 20px;
   border-radius: 5px;
@@ -229,7 +194,8 @@ h3 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.detail-input, .detail-description {
+.detail-input,
+.detail-description {
   width: 100%;
   margin-bottom: 10px;
   border-radius: 5px;
@@ -245,7 +211,8 @@ h3 {
 .image-wrapper {
   display: flex;
   overflow: hidden;
-  width: 200px; /* 한 번에 보여줄 이미지의 너비에 맞게 조정 */
+  width: 200px;
+  /* 한 번에 보여줄 이미지의 너비에 맞게 조정 */
 }
 
 .scroll-button {
