@@ -1,16 +1,16 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useMapStore } from "@/stores/map";
-import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { storeToRefs } from "pinia";
 const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
-
 
 mapboxgl.accessToken = VITE_MAPBOX_ACCESSTOKEN;
 
 const mapStore = useMapStore();
 const mapContainer = ref(null);
+const geocoderContainer = ref(null);
 const secondsPerRevolution = 120;
 const maxSpinZoom = 5;
 let userInteracting = false;
@@ -40,6 +40,14 @@ const spinGlobe = (map) => {
 
 onMounted(() => {
     window.map = getMap();
+
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        placeholder: '검색'  // 여기서 플레이스홀더 텍스트를 설정합니다.
+    });
+
+    geocoderContainer.value.appendChild(geocoder.onAdd(window.map));
 
     window.map.on('zoomstart', () => {
         spinEnabled = false;
@@ -115,11 +123,17 @@ const printMarker = (map) => {
 </script>
 
 <template>
-    <img class="logo" width="250" src="@/assets/m-log-logo.png" />
+    <div class="header">
+        <img class="logo" width="300" src="@/assets/m-log-logo.png" />
+        <div ref="geocoderContainer" class="geocoder-container"></div>
+    </div>
     <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <style>
+@import url('https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css');
+@import url('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css');
+
 .marker {
     display: block;
     border: none;
@@ -137,9 +151,12 @@ const printMarker = (map) => {
     position: relative;
 }
 
-.logo {
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: absolute;
-    top: 0;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
