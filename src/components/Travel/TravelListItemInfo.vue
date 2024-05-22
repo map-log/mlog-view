@@ -1,8 +1,7 @@
 <template>
-  <div v-if="travelDetail">
-    <!-- 여행 기록 추가 form -->
-    <div class="travel-detail">
-      <!-- 사진 추가 -->
+  <div class="travel-detail-container">
+    <div v-if="travelDetail" class="travel-detail">
+      <!-- 여행 기록 상세 정보 -->
       <h3>사진</h3>
       <div class="clearfix">
         <img :src="travelDetail.imageUrl" alt="Uploaded Image" class="uploaded-image" />
@@ -47,13 +46,16 @@
         <h3>설명</h3>
         <a-textarea v-model:value="detail.description" readonly class="detail-description" rows="2" />
       </div>
+
+      <a-button type="primary" @click="emitOpenUpdateForm" class="action-button edit-button">수정</a-button>
+      <a-button type="primary" @click="deleteTravel" class="action-button delete-button">삭제</a-button>
     </div>
-    <a-button type="primary" @click="deleteTravel" class="action-button delete-button">삭제</a-button>
-  </div>
-  <div v-else>
-    <p>로딩 중...</p>
+    <div v-else>
+      <p>로딩 중...</p>
+    </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
@@ -72,6 +74,7 @@ const props = defineProps({
 const travelDetail = ref(null);
 const dateRange = ref([]);
 const imageContainerRefs = ref([]);
+const emit = defineEmits(['updateList', 'closeDetail', 'openUpdateForm']);
 
 const travelStore = useTravelStore();
 
@@ -80,7 +83,6 @@ const fetchTravelDetail = async (id) => {
     try {
       const { response } = await travelStore.fetchTravelDetail(id);
       travelDetail.value = response;
-      console.log(response);
       dateRange.value = [moment(response.startDate), moment(response.endDate)];
       nextTick(() => {
         imageContainerRefs.value = document.querySelectorAll('.image-wrapper');
@@ -109,8 +111,6 @@ const scrollRight = (index) => {
   }
 };
 
-const emit = defineEmits(['updateList', 'closeDetail']);
-
 const deleteTravel = async () => {
   try {
     await travelStore.delTravelDetail(props.travelId);
@@ -120,6 +120,10 @@ const deleteTravel = async () => {
   } catch (error) {
     console.error('Error deleting travel detail:', error);
   }
+};
+
+const emitOpenUpdateForm = () => {
+  emit('openUpdateForm', props.travelId);
 };
 
 onMounted(() => {
@@ -142,7 +146,14 @@ watch(() => props.travelId, (newId) => {
 });
 </script>
 
+
 <style scoped>
+.travel-detail-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .travel-detail {
   background: #ffffff;
   padding: 20px;
@@ -300,5 +311,21 @@ h3 {
 .edit-button {
   background-color: #4682b4;
   /* 수정 버튼 색상: Steel Blue */
+}
+
+.edit-form-container {
+  position: fixed;
+  /* 전체 화면의 오른쪽에 고정 */
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+  /* 다른 요소들 위에 표시되도록 설정 */
 }
 </style>

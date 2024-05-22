@@ -21,6 +21,7 @@ import brandenburgGate from '@/assets/brandenburg_gate.png';
 import sagradaFamilia from '@/assets/sagrada_familia.png';
 import grandPalace from '@/assets/grand_palace.png';
 import N from '@/assets/N.jpg';
+import M from '@/assets/Bear.jpg';
 
 const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
 
@@ -204,7 +205,12 @@ const setDefaultMarkers = () => {
         {
             coordinates: [0, -90],
             img: N,
-            name: "Antarctica"
+            name: "Antarctica: Penguin"
+        },
+        {
+            coordinates: [0, 90],
+            img: M,
+            name: "North Pole: Polar bear"
         }
     ];
     mapStore.markerList.push(...defaultMarkers);

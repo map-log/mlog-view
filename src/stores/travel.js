@@ -7,6 +7,7 @@ import {
   getTravelDetail,
   getPhotoDetail,
   deleteTravelDetail,
+  updateTravelDetail,
 } from "@/api/travel";
 import { httpStatusCode } from "@/util/http-status";
 import { useMemberStore } from "@/stores/member";
@@ -115,6 +116,23 @@ export const useTravelStore = defineStore("travelStore", () => {
     );
   };
 
+  const modifyTravelDetail = async (travelId, travelData) => {
+    await updateTravelDetail(
+      travelId,
+      travelData,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("여행 기록 수정 성공");
+        } else {
+          console.log("여행 기록 수정 실패");
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  };
+
   return {
     createTravelLog,
     fetchTravelList,
@@ -123,5 +141,6 @@ export const useTravelStore = defineStore("travelStore", () => {
     travelList,
     travelDetail,
     delTravelDetail,
+    modifyTravelDetail,
   };
 });

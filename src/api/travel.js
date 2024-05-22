@@ -35,9 +35,14 @@ async function getPhotoDetail(travelDetailId, success, fail) {
 }
 
 async function deleteTravelDetail(travelId, success, fail) {
-  console.log("API 호출: deleteTravelDetail, deleteTravelDetail:", travelId); // API 호출 확인
   local.defaults.headers["X-MLOG-AUTH"] = `Bearer ${sessionStorage.getItem("accessToken")}`;
   await local.delete(`/travel/${travelId}`).then(success).catch(fail);
+}
+
+async function updateTravelDetail(travelId, param, success, fail) {
+  console.log("API 호출: deleteTravelDetail, updateTravelDetail:", travelId); // API 호출 확인
+  local.defaults.headers["X-MLOG-AUTH"] = `Bearer ${sessionStorage.getItem("accessToken")}`;
+  await local.put(`/travel/${travelId}`, param).then(success).catch(fail);
 }
 
 export {
@@ -47,4 +52,5 @@ export {
   getTravelDetail,
   getPhotoDetail,
   deleteTravelDetail,
+  updateTravelDetail,
 };
