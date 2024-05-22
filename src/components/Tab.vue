@@ -58,7 +58,7 @@
     <!-- 수정 컴포넌트를 화면 오른쪽에 고정 -->
     <div v-if="isUpdateFormOpen" class="edit-form-container">
       <TravelListDetailUpdate :travelId="selectedTravelIdForUpdate" @updateList="handleUpdateList"
-        @closeDrawer="closeUpdateForm" />
+        @closeDrawer="handleCloseDetailDrawer" />
     </div>
 
     <!-- CreateView 컴포넌트를 추가하여 updateList 이벤트를 처리 -->
@@ -109,11 +109,13 @@ const selectedTravelIdForUpdate = ref(null);
 const showItemDetailDrawer = (item) => {
   selectedItem.value = item;
   itemDetailOpen.value = true;
+  closeUpdateForm(); // 다른 카드를 선택할 때 수정 폼 닫기
 };
 
 const closeItemDetailDrawer = () => {
   itemDetailOpen.value = false;
   selectedItem.value = null;
+  closeUpdateForm();
 };
 
 const showUpdateForm = () => {
@@ -192,9 +194,14 @@ const createMarker = (latitude, longitude, img) => {
 const handleUpdateList = async () => {
   await store.fetchTravelList();
   addTravelMarkers();
+  closeUpdateForm(); // 수정 폼 닫기
+};
+
+const handleCloseDetailDrawer = () => {
+  isUpdateFormOpen.value = false;
+  itemDetailOpen.value = false; // 상세 정보 Drawer 닫기
 };
 </script>
-
 
 <style>
 .ant-drawer-body::-webkit-scrollbar {

@@ -12,7 +12,7 @@
     </a-modal>
 
     <h3>위치</h3>
-    <GoogleMap @change-position="onChangePosition" />
+    <GoogleMap :lat="form.lat" :lng="form.lng" @change-position="onChangePosition" />
 
     <h3>제목</h3>
     <a-input v-model:value="form.title" placeholder="나의 행복한 여행..." />
@@ -51,14 +51,15 @@
     </div>
 
     <div style="display: flex; justify-content: center; margin-top: 20px;">
-      <a-button type="dashed" @click="addDetailSchedule">상세 기록 추가하기</a-button>
+      <a-button type="dashed" @click="addDetailSchedule" class="add-detail-button">상세 기록 추가하기</a-button>
     </div>
 
-    <a-button type="primary" @click="onSave">수정 완료</a-button>
-    <a-button type="default" @click="onClose">닫기</a-button>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+      <a-button type="primary" @click="onSave" class="action-button">수정 완료</a-button>
+      <a-button @click="onClose" class="action-button">닫기</a-button>
+    </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, defineProps, defineEmits, onMounted } from 'vue';
@@ -108,6 +109,7 @@ const fetchTravelDetail = async (id) => {
         lat: response.lat,
         lng: response.lng,
       };
+      console.log("데이터" + response.lat,response.lng)
       detailedSchedules.value = response.detailedSchedules.map((schedule) => ({
         title: schedule.title,
         description: schedule.description,
@@ -208,7 +210,7 @@ const onSave = async () => {
     await modifyTravelDetail(props.travelId, travelData);
     message.success('수정 성공!');
     emit('updateList');
-    emit('closeDrawer');
+    emit('closeDrawer'); // 상세 정보 창 닫기
     emit('closeForm'); // 상세 정보 창 닫기
   } catch (error) {
     message.error('수정 실패');
@@ -218,7 +220,7 @@ const onSave = async () => {
 
 const onClose = () => {
   emit('closeDrawer');
-  emit('closeForm'); // 상세 정보 창 닫기
+  // emit('closeForm'); // 상세 정보 창 닫기
 };
 
 onMounted(() => {
@@ -348,10 +350,17 @@ h3 {
   animation: animate 2s linear infinite;
 }
 
+.add-detail-button {
+  margin-bottom: 20px;
+}
+
 .action-button {
   margin-top: 20px;
-  display: inline-block;
   margin-right: 8px;
+}
+
+.action-button:last-child {
+  margin-right: 0;
 }
 
 .delete-button {
