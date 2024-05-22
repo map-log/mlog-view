@@ -32,7 +32,6 @@ const mapStore = useMapStore();
 const store = useTravelStore();
 const { travelList } = storeToRefs(store);
 
-// 새로운 drawer 관련 상태 및 메서드
 const itemDetailOpen = ref(false);
 const selectedItem = ref(null);
 const showItemDetailDrawer = (item) => {
@@ -44,7 +43,6 @@ const closeItemDetailDrawer = () => {
   selectedItem.value = null;
 };
 
-// 관광지 상세 정보 drawer 관련 상태 및 메서드 추가
 const tourDetailOpen = ref(false);
 const selectedTourItem = ref(null);
 const showTourDetailDrawer = (item) => {
@@ -56,32 +54,28 @@ const closeTourDetailDrawer = () => {
   selectedTourItem.value = null;
 };
 
-// 마커 초기화 함수
 const resetMarkers = () => {
   mapStore.reset();
 };
 
-// TravelList의 마커 추가 함수
 const addTravelMarkers = () => {
   resetMarkers();
   const markers = travelList.value.map(travel => createMarker(travel.lat, travel.lng, travel.imageUrl));
   mapStore.markerList = markers;
 };
 
-// TourList의 마커 추가 함수
 const addTourMarkers = () => {
   resetMarkers();
 };
 
 const fetchTravelList = async () => {
   try {
-    await store.fetchTravelList();  // 여행 기록 리스트를 갱신하는 메서드 호출
+    await store.fetchTravelList();
   } catch (error) {
     console.error('Error fetching travel list:', error);
   }
 };
 
-// watch를 사용하여 activeKey를 감시하고 탭 변경 시 마커 설정
 watch(activeKey, (newKey) => {
   if (newKey === '1') {
     addTravelMarkers();
@@ -90,7 +84,6 @@ watch(activeKey, (newKey) => {
   }
 });
 
-// 초기 마커 설정
 onMounted(() => {
   if (activeKey.value === '1') {
     addTravelMarkers();
@@ -105,6 +98,13 @@ const createMarker = (latitude, longitude, img) => {
     coordinates: [longitude, latitude],
   };
 };
+
+// 여행 기록 추가 후 목록 갱신을 위한 이벤트 핸들러
+const handleUpdateList = async () => {
+  await store.fetchTravelList();
+  addTravelMarkers();
+};
+
 </script>
 
 <template>
@@ -162,28 +162,24 @@ const createMarker = (latitude, longitude, img) => {
       </a-tabs>
     </a-drawer>
   </div>
-  <CreateView @updateList="fetchTravelList" />
+  <!-- CreateView 컴포넌트를 추가하여 updateList 이벤트를 처리 -->
+  <CreateView @updateList="handleUpdateList" />
 </template>
 
 <style>
-/* 스크롤바의 폭 너비 */
 .ant-drawer-body::-webkit-scrollbar {
   width: 5px;
 }
 
 .ant-drawer-body::-webkit-scrollbar-thumb {
   background: rgb(87, 87, 87);
-  /* 스크롤바 색상 */
   border-radius: 10px;
-  /* 스크롤바 둥근 테두리 */
 }
 
 .ant-drawer-body::-webkit-scrollbar-track {
   background: rgb(255, 255, 255);
-  /*스크롤바 뒷 배경 색상*/
 }
 
-/* 두 drawer가 나란히 배치되도록 스타일링 */
 .drawer-container {
   display: flex;
 }
