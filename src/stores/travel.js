@@ -1,7 +1,13 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { defineStore, storeToRefs } from "pinia";
-import { saveTravelLog, getTravelList, getTravelDetail, getPhotoDetail } from "@/api/travel";
+import {
+  saveTravelLog,
+  getTravelList,
+  getTravelDetail,
+  getPhotoDetail,
+  deleteTravelDetail,
+} from "@/api/travel";
 import { httpStatusCode } from "@/util/http-status";
 import { useMemberStore } from "@/stores/member";
 
@@ -93,6 +99,22 @@ export const useTravelStore = defineStore("travelStore", () => {
     return photoList;
   };
 
+  const delTravelDetail = async (travelId) => {
+    await deleteTravelDetail(
+      travelId,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("여행 기록 삭제 성공");
+        } else {
+          console.log("여행 기록 삭제 실패");
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  };
+
   return {
     createTravelLog,
     fetchTravelList,
@@ -100,5 +122,6 @@ export const useTravelStore = defineStore("travelStore", () => {
     fetchPhotoDetail,
     travelList,
     travelDetail,
+    delTravelDetail,
   };
 });

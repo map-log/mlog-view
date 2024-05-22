@@ -1,9 +1,9 @@
 <script setup>
-import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref } from 'vue';
+import { PlusOutlined } from '@ant-design/icons-vue';
+import { ref, defineEmits } from 'vue';
 import { message } from 'ant-design-vue';
-import { useTravelStore } from '@/stores/travel'
-import GoogleMap from '@/components/Map/GoogleMap.vue'
+import { useTravelStore } from '@/stores/travel';
+import GoogleMap from '@/components/Map/GoogleMap.vue';
 
 const form = ref({
     lat: '',
@@ -18,19 +18,15 @@ const rules = {
     img: [{
         required: true,
         message: 'Please enter url description',
-    }
-    ],
+    }],
     title: [{
         required: true,
         message: 'Please enter url description',
-    }
-    ],
-    description: [
-        {
-            required: true,
-            message: 'Please enter url description',
-        },
-    ],
+    }],
+    description: [{
+        required: true,
+        message: 'Please enter url description',
+    }],
 };
 
 const open = ref(false);
@@ -39,6 +35,7 @@ const showDrawer = () => {
 };
 const onClose = () => {
     open.value = false;
+    resetForm();
 };
 
 function getBase64(file) {
@@ -49,6 +46,7 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
+
 const previewVisible = ref(false);
 const previewImage = ref('');
 const previewTitle = ref('');
@@ -67,57 +65,64 @@ const handlePreview = async file => {
 };
 
 const success = () => {
-    onClose()
-
-    message
-        .loading('저장중..', 2.5)
-        .then(
-            () => message.success('저장 성공!!!', 2.5),
-        )
+    onClose();
+    message.loading('저장중..', 1)
+        .then(() => message.success('저장 성공!!!', 1));
 };
 
-const detailedSchedules = ref([])
+const detailedSchedules = ref([]);
 
 const addDetailSchedule = () => {
     detailedSchedules.value.push({
         fileList: [],
         title: "",
         description: "",
-    })
-}
+    });
+};
 
 const removeDetailSchedule = (index) => {
     detailedSchedules.value.splice(index, 1);
-}
+};
 
-const lat = ref(0)
-const lng = ref(0)
+const lat = ref(0);
+const lng = ref(0);
 
 const onChangePosition = (x, y) => {
-    console.log(x, y)
     lat.value = x;
     lng.value = y;
-    console.log(lat.value, lng.value)
-}
+};
 
 const travelStore = useTravelStore();
 const { createTravelLog } = travelStore;
 
 const fileList = ref([]);
+const emit = defineEmits(['updateList']);
+
+const resetForm = () => {
+    form.value = {
+        lat: '',
+        lng: '',
+        title: '',
+        dateRange: '',
+        rate: '',
+        description: '',
+    };
+    detailedSchedules.value = [];
+    fileList.value = [];
+    lat.value = 0;
+    lng.value = 0;
+};
 
 const onSave = async () => {
-
-    // 첫 번째 파일만 Base64로 변환하여 titleImg에 할당
-    const firstFile = fileList.value[0]; // 첫 번째 파일만 선택
+    const firstFile = fileList.value[0];
     const titleImg = ref(null);
     if (firstFile) {
         if (!firstFile.url && !firstFile.preview) {
             firstFile.preview = await getBase64(firstFile.originFileObj);
         }
-        titleImg.value = firstFile.preview; // 첫 번째 파일의 Base64 이미지를 titleImg에 할당
+        titleImg.value = firstFile.preview;
     }
 
-    // 상세 일정의 각 파일을 Base64로 변환
     const detailedSchedulesData = await Promise.all(detailedSchedules.value.map(async (detail, index) => {
         const detailImages = await Promise.all(detail.fileList.map(async file => {
             if (!file.url && !file.preview) {
@@ -130,7 +135,7 @@ const onSave = async () => {
             seq: index + 1,
             title: detail.title,
             description: detail.description,
-            images: detailImages
+            images: detailImages,
         };
     }));
 
@@ -143,14 +148,13 @@ const onSave = async () => {
         startDate: form.value.dateRange[0],
         endDate: form.value.dateRange[1],
         rating: form.value.rate,
-        detailedSchedules: detailedSchedulesData
+        detailedSchedules: detailedSchedulesData,
     };
 
-    console.log(travelData)
     await createTravelLog(travelData);
-    onClose();
+    success();
+    emit('updateList');
 };
-
 
 </script>
 

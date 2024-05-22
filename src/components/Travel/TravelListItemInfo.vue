@@ -2,7 +2,6 @@
   <div v-if="travelDetail">
     <!-- 여행 기록 추가 form -->
     <div class="travel-detail">
-
       <!-- 사진 추가 -->
       <h3>사진</h3>
       <div class="clearfix">
@@ -50,9 +49,6 @@
       </div>
     </div>
     <a-button type="primary" @click="deleteTravel" class="action-button delete-button">삭제</a-button>
-
-    <!-- 수정 버튼 -->
-    <a-button type="primary" @click="editTravel" class="action-button edit-button">수정</a-button>    
   </div>
   <div v-else>
     <p>로딩 중...</p>
@@ -64,6 +60,7 @@ import { ref, onMounted, watch, nextTick } from 'vue';
 import { useTravelStore } from '@/stores/travel';
 import GoogleMap from '@/components/Map/GoogleMap.vue';
 import moment from 'moment';
+import { defineEmits } from 'vue';
 
 const props = defineProps({
   travelId: {
@@ -112,12 +109,17 @@ const scrollRight = (index) => {
   }
 };
 
-const deleteTravel = () => {
-  // 삭제 로직 구현
-};
+const emit = defineEmits(['updateList', 'closeDetail']);
 
-const editTravel = () => {
-  // 수정 로직 구현
+const deleteTravel = async () => {
+  try {
+    await travelStore.delTravelDetail(props.travelId);
+    travelDetail.value = null; // 성공적으로 삭제 후 null로 변경하여 UI를 갱신
+    emit('updateList');
+    emit('closeDetail'); // 드로어 닫기 이벤트 발생
+  } catch (error) {
+    console.error('Error deleting travel detail:', error);
+  }
 };
 
 onMounted(() => {
@@ -283,17 +285,20 @@ h3 {
 }
 
 .action-button {
-  margin-top: 20px; /* 맨 아래에 위치하도록 여백 추가 */
+  margin-top: 20px;
+  /* 맨 아래에 위치하도록 여백 추가 */
   display: inline-block;
-  margin-right: 8px; /* 버튼 사이 간격 조절 */
+  margin-right: 8px;
+  /* 버튼 사이 간격 조절 */
 }
 
 .delete-button {
-  background-color: #ff6347; /* 삭제 버튼 색상: Tomato Red */
+  background-color: #ff6347;
+  /* 삭제 버튼 색상: Tomato Red */
 }
 
 .edit-button {
-  background-color: #4682b4; /* 수정 버튼 색상: Steel Blue */
+  background-color: #4682b4;
+  /* 수정 버튼 색상: Steel Blue */
 }
-
 </style>
