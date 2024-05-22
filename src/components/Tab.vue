@@ -8,6 +8,7 @@ import TravelList from './Travel/TravelList.vue';
 import { useMapStore } from '@/stores/map';
 import { storeToRefs } from 'pinia';
 import { useTravelStore } from '@/stores/travel';
+import CreateView from '@/components/CreateView.vue';
 
 const activeKey = ref('1');
 const placement = ref('left');
@@ -35,7 +36,6 @@ const { travelList } = storeToRefs(store);
 const itemDetailOpen = ref(false);
 const selectedItem = ref(null);
 const showItemDetailDrawer = (item) => {
-  console.log("Item clicked:", item); // 로그 추가
   selectedItem.value = item;
   itemDetailOpen.value = true;
 };
@@ -71,6 +71,14 @@ const addTravelMarkers = () => {
 // TourList의 마커 추가 함수
 const addTourMarkers = () => {
   resetMarkers();
+};
+
+const fetchTravelList = async () => {
+  try {
+    await store.fetchTravelList();  // 여행 기록 리스트를 갱신하는 메서드 호출
+  } catch (error) {
+    console.error('Error fetching travel list:', error);
+  }
 };
 
 // watch를 사용하여 activeKey를 감시하고 탭 변경 시 마커 설정
@@ -117,7 +125,8 @@ const createMarker = (latitude, longitude, img) => {
           </template>
         </a-button>
       </template>
-      <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" />
+      <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" @updateList="fetchTravelList"
+        @closeDetail="closeItemDetailDrawer" />
     </a-drawer>
 
     <!-- 관광지 상세 정보 drawer 추가 -->
@@ -145,7 +154,7 @@ const createMarker = (latitude, longitude, img) => {
       <a-tabs v-model:activeKey="activeKey">
         <a-tab-pane key="1" tab="내 여행 기록">
           <TravelList :selectedItem="selectedItem" :itemDetailOpen="itemDetailOpen"
-            :showItemDetailDrawer="showItemDetailDrawer" />
+            :showItemDetailDrawer="showItemDetailDrawer" @updateList="fetchTravelList" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="관광지 정보">
           <TourList @itemClick="showTourDetailDrawer" />
@@ -153,6 +162,7 @@ const createMarker = (latitude, longitude, img) => {
       </a-tabs>
     </a-drawer>
   </div>
+  <CreateView @updateList="fetchTravelList" />
 </template>
 
 <style>
