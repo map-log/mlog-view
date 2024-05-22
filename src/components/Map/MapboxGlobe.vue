@@ -20,6 +20,7 @@ import hagiaSophia from '@/assets/hagia_sophia.png';
 import brandenburgGate from '@/assets/brandenburg_gate.png';
 import sagradaFamilia from '@/assets/sagrada_familia.png';
 import grandPalace from '@/assets/grand_palace.png';
+import N from '@/assets/N.jpg';
 
 const { VITE_MAPBOX_ACCESSTOKEN, VITE_MAPBOX_STYLE } = import.meta.env;
 
@@ -121,84 +122,89 @@ const watchMarker = watch(markerList, () => {
 const setDefaultMarkers = () => {
     const defaultMarkers = [
         {
-            coordinates: [2.2945, 48.8584], 
-            img: eiffelTower, 
-            name: "France: Eiffel Tower" 
+            coordinates: [2.2945, 48.8584],
+            img: eiffelTower,
+            name: "France: Eiffel Tower"
         },
         {
-            coordinates: [139.8107, 35.6586], 
-            img: tokyoTower, 
-            name: "Japan: Tokyo Tower" 
+            coordinates: [139.8107, 35.6586],
+            img: tokyoTower,
+            name: "Japan: Tokyo Tower"
         },
         {
-            coordinates: [-74.0445, 40.6892], 
-            img: statueOfLiberty, 
-            name: "USA: Statue of Liberty" 
+            coordinates: [-74.0445, 40.6892],
+            img: statueOfLiberty,
+            name: "USA: Statue of Liberty"
         },
         {
-            coordinates: [-0.1246, 51.5007], 
-            img: bigBen, 
-            name: "UK: Big Ben" 
+            coordinates: [-0.1246, 51.5007],
+            img: bigBen,
+            name: "UK: Big Ben"
         },
         {
-            coordinates: [12.4924, 41.8902], 
-            img: colosseum, 
-            name: "Italy: Colosseum" 
+            coordinates: [12.4924, 41.8902],
+            img: colosseum,
+            name: "Italy: Colosseum"
         },
         {
-            coordinates: [116.5704, 40.4319], 
-            img: greatWall, 
-            name: "China: Great Wall of China" 
+            coordinates: [116.5704, 40.4319],
+            img: greatWall,
+            name: "China: Great Wall of China"
         },
         {
-            coordinates: [-43.2105, -22.9519], 
-            img: christRedeemer, 
-            name: "Brazil: Christ the Redeemer" 
+            coordinates: [-43.2105, -22.9519],
+            img: christRedeemer,
+            name: "Brazil: Christ the Redeemer"
         },
         {
-            coordinates: [151.2153, -33.857], 
-            img: sydneyOperaHouse, 
-            name: "Australia: Sydney Opera House" 
+            coordinates: [151.2153, -33.857],
+            img: sydneyOperaHouse,
+            name: "Australia: Sydney Opera House"
         },
         {
-            coordinates: [78.0421, 27.1751], 
-            img: tajMahal, 
-            name: "India: Taj Mahal" 
+            coordinates: [78.0421, 27.1751],
+            img: tajMahal,
+            name: "India: Taj Mahal"
         },
         {
-            coordinates: [126.9882, 37.5512], 
-            img: nSeoulTower, 
-            name: "South Korea: N Seoul Tower" 
+            coordinates: [126.9882, 37.5512],
+            img: nSeoulTower,
+            name: "South Korea: N Seoul Tower"
         },
         {
-            coordinates: [31.1342, 29.9792], 
-            img: pyramids, 
-            name: "Egypt: Pyramids of Giza" 
+            coordinates: [31.1342, 29.9792],
+            img: pyramids,
+            name: "Egypt: Pyramids of Giza"
         },
         {
-            coordinates: [37.6204, 55.7525], 
-            img: saintBasilsCathedral, 
-            name: "Russia: Saint Basil's Cathedral" 
+            coordinates: [37.6204, 55.7525],
+            img: saintBasilsCathedral,
+            name: "Russia: Saint Basil's Cathedral"
         },
         {
-            coordinates: [28.9795, 41.0086], 
-            img: hagiaSophia, 
-            name: "Turkey: Hagia Sophia" 
+            coordinates: [28.9795, 41.0086],
+            img: hagiaSophia,
+            name: "Turkey: Hagia Sophia"
         },
         {
-            coordinates: [13.3777, 52.5163], 
-            img: brandenburgGate, 
-            name: "Germany: Brandenburg Gate" 
+            coordinates: [13.3777, 52.5163],
+            img: brandenburgGate,
+            name: "Germany: Brandenburg Gate"
         },
         {
-            coordinates: [2.1744, 41.4036], 
-            img: sagradaFamilia, 
-            name: "Spain: Sagrada Familia" 
+            coordinates: [2.1744, 41.4036],
+            img: sagradaFamilia,
+            name: "Spain: Sagrada Familia"
         },
         {
-            coordinates: [100.4928, 13.7525], 
-            img: grandPalace, 
-            name: "Thailand: Grand Palace" 
+            coordinates: [100.4928, 13.7525],
+            img: grandPalace,
+            name: "Thailand: Grand Palace"
+        },
+        {
+            coordinates: [0, -90],
+            img: N,
+            name: "Antarctica"
         }
     ];
     mapStore.markerList.push(...defaultMarkers);

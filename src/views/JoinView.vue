@@ -5,9 +5,6 @@
       <h1>회원가입</h1>
     </div>
     <a-form :model="registerData" @finish="onRegister" class="register-form">
-      <a-form-item label="아이디" name="id" rules="[ { required: true, message: '아이디를 입력해 주세요!' } ]">
-        <a-input v-model:value="registerData.id" />
-      </a-form-item>
       <a-form-item label="이름" name="name" rules="[ { required: true, message: '이름을 입력해 주세요!' } ]">
         <a-input v-model:value="registerData.name" />
       </a-form-item>
@@ -40,7 +37,6 @@ const memberStore = useMemberStore();
 const router = useRouter();
 
 const registerData = reactive({
-  id: '',
   email: '',
   name: '',
   password: '',

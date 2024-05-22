@@ -8,7 +8,7 @@
       <div class="messages">
         <div v-for="message in messages" :key="message.id" :class="['message', message.sender]">
           <div v-if="message.sender === 'ai' && isJSON(message.text)" class="message-content">
-            <div v-for="(place, index) in JSON.parse(message.text).recommended_places" :key="place.name" class="place-card">
+            <div v-for="(place, index) in parseJSON(message.text)" :key="place.name" class="place-card">
               <h3>{{ index + 1 }}. {{ place.name }}</h3>
               <p>{{ place.category }}</p>
             </div>
@@ -64,6 +64,15 @@ const isJSON = (str) => {
     return false;
   }
 };
+
+const parseJSON = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return parsed.recommended_places || [];
+  } catch {
+    return [];
+  }
+};
 </script>
 
 <style scoped>
@@ -71,7 +80,8 @@ const isJSON = (str) => {
   position: fixed;
   bottom: 24px;
   left: 24px;
-  width: 320px;
+  width: 300px;
+  /* 폭을 줄였습니다. */
   max-height: 500px;
   display: flex;
   flex-direction: column;
@@ -87,7 +97,8 @@ const isJSON = (str) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 1px 15px;
+  /* 패딩 값을 줄여 세로 크기를 줄였습니다. */
   background-color: #343a40;
   color: white;
   border-bottom: 1px solid #e9ecef;
@@ -176,7 +187,7 @@ const isJSON = (str) => {
 }
 
 .send-button:hover {
-  background-color: #6c757d;
+  background-color: #5a6268;
 }
 
 .place-card {
