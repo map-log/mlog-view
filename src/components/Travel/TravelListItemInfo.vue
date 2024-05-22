@@ -49,6 +49,10 @@
         <a-textarea v-model:value="detail.description" readonly class="detail-description" rows="2" />
       </div>
     </div>
+    <a-button type="primary" @click="deleteTravel" class="action-button delete-button">삭제</a-button>
+
+    <!-- 수정 버튼 -->
+    <a-button type="primary" @click="editTravel" class="action-button edit-button">수정</a-button>    
   </div>
   <div v-else>
     <p>로딩 중...</p>
@@ -106,6 +110,14 @@ const scrollRight = (index) => {
       behavior: 'smooth'
     });
   }
+};
+
+const deleteTravel = () => {
+  // 삭제 로직 구현
+};
+
+const editTravel = () => {
+  // 수정 로직 구현
 };
 
 onMounted(() => {
@@ -269,4 +281,19 @@ h3 {
   text-decoration-line: underline;
   animation: animate 2s linear infinite;
 }
+
+.action-button {
+  margin-top: 20px; /* 맨 아래에 위치하도록 여백 추가 */
+  display: inline-block;
+  margin-right: 8px; /* 버튼 사이 간격 조절 */
+}
+
+.delete-button {
+  background-color: #ff6347; /* 삭제 버튼 색상: Tomato Red */
+}
+
+.edit-button {
+  background-color: #4682b4; /* 수정 버튼 색상: Steel Blue */
+}
+
 </style>

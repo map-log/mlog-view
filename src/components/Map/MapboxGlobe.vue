@@ -120,22 +120,86 @@ const watchMarker = watch(markerList, () => {
 
 const setDefaultMarkers = () => {
     const defaultMarkers = [
-        { coordinates: [2.2945, 48.8584], img: eiffelTower, name: "Eiffel Tower" },
-        { coordinates: [139.8107, 35.6586], img: tokyoTower, name: "Tokyo Tower" },
-        { coordinates: [-74.0445, 40.6892], img: statueOfLiberty, name: "Statue of Liberty" },
-        { coordinates: [-0.1246, 51.5007], img: bigBen, name: "Big Ben" },
-        { coordinates: [12.4924, 41.8902], img: colosseum, name: "Colosseum" },
-        { coordinates: [116.5704, 40.4319], img: greatWall, name: "Great Wall of China" },
-        { coordinates: [-43.2105, -22.9519], img: christRedeemer, name: "Christ the Redeemer" },
-        { coordinates: [151.2153, -33.857], img: sydneyOperaHouse, name: "Sydney Opera House" },
-        { coordinates: [78.0421, 27.1751], img: tajMahal, name: "Taj Mahal" },
-        { coordinates: [126.9882, 37.5512], img: nSeoulTower, name: "N Seoul Tower" },
-        { coordinates: [31.1342, 29.9792], img: pyramids, name: "Pyramids of Giza" },
-        { coordinates: [37.6204, 55.7525], img: saintBasilsCathedral, name: "Saint Basil's Cathedral" },
-        { coordinates: [28.9795, 41.0086], img: hagiaSophia, name: "Hagia Sophia" },
-        { coordinates: [13.3777, 52.5163], img: brandenburgGate, name: "Brandenburg Gate" },
-        { coordinates: [2.1744, 41.4036], img: sagradaFamilia, name: "Sagrada Familia" },
-        { coordinates: [100.4928, 13.7525], img: grandPalace, name: "Grand Palace" }
+        {
+            coordinates: [2.2945, 48.8584], 
+            img: eiffelTower, 
+            name: "France: Eiffel Tower" 
+        },
+        {
+            coordinates: [139.8107, 35.6586], 
+            img: tokyoTower, 
+            name: "Japan: Tokyo Tower" 
+        },
+        {
+            coordinates: [-74.0445, 40.6892], 
+            img: statueOfLiberty, 
+            name: "USA: Statue of Liberty" 
+        },
+        {
+            coordinates: [-0.1246, 51.5007], 
+            img: bigBen, 
+            name: "UK: Big Ben" 
+        },
+        {
+            coordinates: [12.4924, 41.8902], 
+            img: colosseum, 
+            name: "Italy: Colosseum" 
+        },
+        {
+            coordinates: [116.5704, 40.4319], 
+            img: greatWall, 
+            name: "China: Great Wall of China" 
+        },
+        {
+            coordinates: [-43.2105, -22.9519], 
+            img: christRedeemer, 
+            name: "Brazil: Christ the Redeemer" 
+        },
+        {
+            coordinates: [151.2153, -33.857], 
+            img: sydneyOperaHouse, 
+            name: "Australia: Sydney Opera House" 
+        },
+        {
+            coordinates: [78.0421, 27.1751], 
+            img: tajMahal, 
+            name: "India: Taj Mahal" 
+        },
+        {
+            coordinates: [126.9882, 37.5512], 
+            img: nSeoulTower, 
+            name: "South Korea: N Seoul Tower" 
+        },
+        {
+            coordinates: [31.1342, 29.9792], 
+            img: pyramids, 
+            name: "Egypt: Pyramids of Giza" 
+        },
+        {
+            coordinates: [37.6204, 55.7525], 
+            img: saintBasilsCathedral, 
+            name: "Russia: Saint Basil's Cathedral" 
+        },
+        {
+            coordinates: [28.9795, 41.0086], 
+            img: hagiaSophia, 
+            name: "Turkey: Hagia Sophia" 
+        },
+        {
+            coordinates: [13.3777, 52.5163], 
+            img: brandenburgGate, 
+            name: "Germany: Brandenburg Gate" 
+        },
+        {
+            coordinates: [2.1744, 41.4036], 
+            img: sagradaFamilia, 
+            name: "Spain: Sagrada Familia" 
+        },
+        {
+            coordinates: [100.4928, 13.7525], 
+            img: grandPalace, 
+            name: "Thailand: Grand Palace" 
+        }
     ];
     mapStore.markerList.push(...defaultMarkers);
 };
@@ -156,7 +220,12 @@ const printMarker = (map) => {
         let popup;
         if (marker.name) {
             popup = new mapboxgl.Popup({ offset: 50 })
-                .setHTML(`<h1>${marker.name}</h1>`);
+                .setHTML(`
+                    <div class="popup-content">
+                        <div class="popup-header">${marker.name.split(": ")[1]}</div>
+                        <div class="popup-subheader">${marker.name.split(": ")[0]}</div>
+                    </div>
+                `);
         }
 
         const newMarker = new mapboxgl.Marker(el)
@@ -191,6 +260,27 @@ const printMarker = (map) => {
     border-radius: 50%;
     cursor: pointer;
     padding: 0;
+}
+
+.popup-content {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.popup-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.popup-subheader {
+    font-size: 14px;
+    color: #666;
 }
 </style>
 
