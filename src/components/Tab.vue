@@ -1,3 +1,71 @@
+<template>
+  <div>
+    <a-float-button type="default" :style="{ top: '24px', left: '24px' }" @click="showDrawer">
+      <template #icon>
+        <AlignCenterOutlined />
+      </template>
+    </a-float-button>
+
+    <div class="drawer-container">
+      <!-- 두 번째 drawer -->
+      <a-drawer title="상세 정보" :placement="'left'" :width="400" :open="itemDetailOpen" :mask="false" :closable="false"
+        class="secondary-drawer">
+        <template #extra>
+          <a-button type="text" style="margin-right: 0px" @click="closeItemDetailDrawer">
+            <template #icon>
+              <DoubleLeftOutlined />
+            </template>
+          </a-button>
+        </template>
+        <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" @updateList="fetchTravelList"
+          @closeDetail="closeItemDetailDrawer" @openUpdateForm="handleOpenUpdateForm" />
+      </a-drawer>
+
+      <!-- 관광지 상세 정보 drawer 추가 -->
+      <a-drawer title="관광지 상세 정보" :placement="'left'" :width="400" :open="tourDetailOpen" :mask="false"
+        :closable="false" class="secondary-drawer">
+        <template #extra>
+          <a-button type="text" style="margin-right: 0px" @click="closeTourDetailDrawer">
+            <template #icon>
+              <DoubleLeftOutlined />
+            </template>
+          </a-button>
+        </template>
+        <TourListItemDetail :item="selectedTourItem" />
+      </a-drawer>
+
+      <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
+        @close="onClose" :mask="false" class="main-drawer">
+        <template #extra>
+          <a-button type="text" style="margin-right: 0px" @click="onClose">
+            <template #icon>
+              <DoubleLeftOutlined />
+            </template>
+          </a-button>
+        </template>
+        <a-tabs v-model:activeKey="activeKey">
+          <a-tab-pane key="1" tab="내 여행 기록">
+            <TravelList :selectedItem="selectedItem" :itemDetailOpen="itemDetailOpen"
+              :showItemDetailDrawer="showItemDetailDrawer" @updateList="fetchTravelList" />
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="관광지 정보">
+            <TourList @itemClick="showTourDetailDrawer" />
+          </a-tab-pane>
+        </a-tabs>
+      </a-drawer>
+    </div>
+
+    <!-- 수정 컴포넌트를 화면 오른쪽에 고정 -->
+    <div v-if="isUpdateFormOpen" class="edit-form-container">
+      <TravelListDetailUpdate :travelId="selectedTravelIdForUpdate" @updateList="handleUpdateList"
+        @closeDrawer="closeUpdateForm" />
+    </div>
+
+    <!-- CreateView 컴포넌트를 추가하여 updateList 이벤트를 처리 -->
+    <CreateView @updateList="handleUpdateList" />
+  </div>
+</template>
+
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { AlignCenterOutlined, DoubleLeftOutlined } from '@ant-design/icons-vue';
@@ -127,72 +195,6 @@ const handleUpdateList = async () => {
 };
 </script>
 
-
-<template>
-  <a-float-button type="default" :style="{ top: '24px', left: '24px' }" @click="showDrawer">
-    <template #icon>
-      <AlignCenterOutlined />
-    </template>
-  </a-float-button>
-
-  <div class="drawer-container">
-    <!-- 두 번째 drawer -->
-    <a-drawer title="상세 정보" :placement="'left'" :width="400" :open="itemDetailOpen" :mask="false" :closable="false"
-      class="secondary-drawer">
-      <template #extra>
-        <a-button type="text" style="margin-right: 0px" @click="closeItemDetailDrawer">
-          <template #icon>
-            <DoubleLeftOutlined />
-          </template>
-        </a-button>
-      </template>
-      <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" @updateList="fetchTravelList"
-        @closeDetail="closeItemDetailDrawer" @openUpdateForm="handleOpenUpdateForm" />
-    </a-drawer>
-
-    <!-- 관광지 상세 정보 drawer 추가 -->
-    <a-drawer title="관광지 상세 정보" :placement="'left'" :width="400" :open="tourDetailOpen" :mask="false" :closable="false"
-      class="secondary-drawer">
-      <template #extra>
-        <a-button type="text" style="margin-right: 0px" @click="closeTourDetailDrawer">
-          <template #icon>
-            <DoubleLeftOutlined />
-          </template>
-        </a-button>
-      </template>
-      <TourListItemDetail :item="selectedTourItem" />
-    </a-drawer>
-
-    <a-drawer title="내 여행 기록..." :width="drawerWidth" :placement="placement" :closable="false" :open="open"
-      @close="onClose" :mask="false" class="main-drawer">
-      <template #extra>
-        <a-button type="text" style="margin-right: 0px" @click="onClose">
-          <template #icon>
-            <DoubleLeftOutlined />
-          </template>
-        </a-button>
-      </template>
-      <a-tabs v-model:activeKey="activeKey">
-        <a-tab-pane key="1" tab="내 여행 기록">
-          <TravelList :selectedItem="selectedItem" :itemDetailOpen="itemDetailOpen"
-            :showItemDetailDrawer="showItemDetailDrawer" @updateList="fetchTravelList" />
-        </a-tab-pane>
-        <a-tab-pane key="2" tab="관광지 정보">
-          <TourList @itemClick="showTourDetailDrawer" />
-        </a-tab-pane>
-      </a-tabs>
-    </a-drawer>
-  </div>
-
-  <!-- 수정 컴포넌트를 화면 오른쪽에 고정 -->
-  <div v-if="isUpdateFormOpen" class="edit-form-container">
-    <TravelListDetailUpdate :travelId="selectedTravelIdForUpdate" @updateList="handleUpdateList"
-      @closeDrawer="closeUpdateForm" />
-  </div>
-
-  <!-- CreateView 컴포넌트를 추가하여 updateList 이벤트를 처리 -->
-  <CreateView @updateList="handleUpdateList" />
-</template>
 
 <style>
 .ant-drawer-body::-webkit-scrollbar {

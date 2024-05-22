@@ -116,9 +116,10 @@ export const useTravelStore = defineStore("travelStore", () => {
     );
   };
 
-  const modifyTravelDetail = async (travelId) => {
+  const modifyTravelDetail = async (travelId, travelData) => {
     await updateTravelDetail(
       travelId,
+      travelData,
       (response) => {
         if (response.status === httpStatusCode.OK) {
           console.log("여행 기록 수정 성공");

@@ -39,10 +39,10 @@ async function deleteTravelDetail(travelId, success, fail) {
   await local.delete(`/travel/${travelId}`).then(success).catch(fail);
 }
 
-async function updateTravelDetail(travelId, success, fail) {
+async function updateTravelDetail(travelId, param, success, fail) {
   console.log("API 호출: deleteTravelDetail, updateTravelDetail:", travelId); // API 호출 확인
   local.defaults.headers["X-MLOG-AUTH"] = `Bearer ${sessionStorage.getItem("accessToken")}`;
-  await local.put(`/travel/${travelId}`).then(success).catch(fail);
+  await local.put(`/travel/${travelId}`, param).then(success).catch(fail);
 }
 
 export {

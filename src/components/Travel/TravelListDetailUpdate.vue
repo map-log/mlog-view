@@ -61,10 +61,11 @@
 
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, onMounted } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { useTravelStore } from '@/stores/travel';
+import moment from 'moment';
 import GoogleMap from '@/components/Map/GoogleMap.vue';
 
 const props = defineProps({
@@ -74,10 +75,10 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['updateList', 'closeForm']);
+const emit = defineEmits(['updateList', 'closeForm', 'closeDrawer']);
 
 const travelStore = useTravelStore();
-const { updateTravel } = travelStore;
+const { modifyTravelDetail } = travelStore;
 
 const form = ref({
   title: '',
@@ -101,17 +102,16 @@ const fetchTravelDetail = async (id) => {
       const { response } = await travelStore.fetchTravelDetail(id);
       form.value = {
         title: response.title,
-        dateRange: [response.startDate, response.endDate],
+        dateRange: [moment(response.startDate), moment(response.endDate)],
         rate: response.rating,
         description: response.description,
         lat: response.lat,
         lng: response.lng,
       };
-      fileList.value = response.imageUrl ? [{ url: response.imageUrl }] : [];
       detailedSchedules.value = response.detailedSchedules.map((schedule) => ({
         title: schedule.title,
         description: schedule.description,
-        fileList: schedule.images.map((image) => ({ url: image })),
+        fileList: [],
       }));
     } catch (error) {
       console.error('Error fetching travel detail:', error);
@@ -160,16 +160,42 @@ const removeDetailSchedule = (index) => {
 
 const onSave = async () => {
   try {
-    const detailedSchedulesData = detailedSchedules.value.map((detail) => ({
-      title: detail.title,
-      description: detail.description,
-      images: detail.fileList.map((file) => file.url || file.preview),
-    }));
+    // 메인 이미지 처리
+    const firstFile = fileList.value[0];
+    const titleImg = ref(null);
+    if (firstFile) {
+      if (!firstFile.url && !firstFile.preview) {
+        firstFile.preview = await getBase64(firstFile.originFileObj);
+      }
+      titleImg.value = firstFile.preview;
+    }
 
+    // 상세 일정 데이터 처리
+    const detailedSchedulesData = await Promise.all(
+      detailedSchedules.value.map(async (detail, index) => {
+        const detailImages = await Promise.all(
+          detail.fileList.map(async (file) => {
+            if (!file.url && !file.preview) {
+              file.preview = await getBase64(file.originFileObj);
+            }
+            return file.url || file.preview;
+          })
+        );
+
+        return {
+          seq: index + 1, // 시퀀스 번호 추가
+          title: detail.title,
+          description: detail.description,
+          images: detailImages,
+        };
+      })
+    );
+
+    // 여행 데이터 구성
     const travelData = {
       title: form.value.title,
       description: form.value.description,
-      image: fileList.value[0]?.url || fileList.value[0]?.preview,
+      image: titleImg.value,
       lat: form.value.lat,
       lng: form.value.lng,
       startDate: form.value.dateRange[0],
@@ -178,10 +204,12 @@ const onSave = async () => {
       detailedSchedules: detailedSchedulesData,
     };
 
-    await updateTravel(props.travelId, travelData);
+    // 여행 기록 수정 API 호출
+    await modifyTravelDetail(props.travelId, travelData);
     message.success('수정 성공!');
     emit('updateList');
-    emit('closeForm');
+    emit('closeDrawer');
+    emit('closeForm'); // 상세 정보 창 닫기
   } catch (error) {
     message.error('수정 실패');
     console.error('Error updating travel:', error);
@@ -189,12 +217,14 @@ const onSave = async () => {
 };
 
 const onClose = () => {
-  emit('closeForm');
+  emit('closeDrawer');
+  emit('closeForm'); // 상세 정보 창 닫기
 };
 
-fetchTravelDetail(props.travelId);
+onMounted(() => {
+  fetchTravelDetail(props.travelId);
+});
 </script>
-
 
 <style scoped>
 .travel-detail {
@@ -280,25 +310,6 @@ h3 {
   display: flex;
   overflow: hidden;
   width: 200px;
-}
-
-.scroll-button {
-  background: transparent;
-  color: #cccccc;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  font-size: 24px;
-  transition: color 0.3s ease;
-}
-
-.scroll-button:hover {
-  color: #999999;
-}
-
-.scroll-button:disabled {
-  color: #e0e0e0;
-  cursor: not-allowed;
 }
 
 .detail-image {
