@@ -5,6 +5,7 @@ import TourList from '@/components/Tour/TourList.vue';
 import TravelListItemInfo from '@/components/Travel/TravelListItemInfo.vue';
 import TourListItemDetail from '@/components/Tour/TourListItemDetail.vue';
 import TravelList from './Travel/TravelList.vue';
+import TravelListDetailUpdate from '@/components/Travel/TravelListDetailUpdate.vue';
 import { useMapStore } from '@/stores/map';
 import { storeToRefs } from 'pinia';
 import { useTravelStore } from '@/stores/travel';
@@ -34,21 +35,41 @@ const { travelList } = storeToRefs(store);
 
 const itemDetailOpen = ref(false);
 const selectedItem = ref(null);
+const isUpdateFormOpen = ref(false);
+const selectedTravelIdForUpdate = ref(null);
+
 const showItemDetailDrawer = (item) => {
   selectedItem.value = item;
   itemDetailOpen.value = true;
 };
+
 const closeItemDetailDrawer = () => {
   itemDetailOpen.value = false;
   selectedItem.value = null;
 };
 
+const showUpdateForm = () => {
+  isUpdateFormOpen.value = true;
+};
+
+const closeUpdateForm = () => {
+  isUpdateFormOpen.value = false;
+  selectedTravelIdForUpdate.value = null;
+};
+
+const handleOpenUpdateForm = (travelId) => {
+  selectedTravelIdForUpdate.value = travelId;
+  showUpdateForm();
+};
+
 const tourDetailOpen = ref(false);
 const selectedTourItem = ref(null);
+
 const showTourDetailDrawer = (item) => {
   selectedTourItem.value = item;
   tourDetailOpen.value = true;
 };
+
 const closeTourDetailDrawer = () => {
   tourDetailOpen.value = false;
   selectedTourItem.value = null;
@@ -104,8 +125,8 @@ const handleUpdateList = async () => {
   await store.fetchTravelList();
   addTravelMarkers();
 };
-
 </script>
+
 
 <template>
   <a-float-button type="default" :style="{ top: '24px', left: '24px' }" @click="showDrawer">
@@ -126,7 +147,7 @@ const handleUpdateList = async () => {
         </a-button>
       </template>
       <TravelListItemInfo :travelDetail="selectedItem" :travelId="selectedItem?.id" @updateList="fetchTravelList"
-        @closeDetail="closeItemDetailDrawer" />
+        @closeDetail="closeItemDetailDrawer" @openUpdateForm="handleOpenUpdateForm" />
     </a-drawer>
 
     <!-- 관광지 상세 정보 drawer 추가 -->
@@ -162,6 +183,13 @@ const handleUpdateList = async () => {
       </a-tabs>
     </a-drawer>
   </div>
+
+  <!-- 수정 컴포넌트를 화면 오른쪽에 고정 -->
+  <div v-if="isUpdateFormOpen" class="edit-form-container">
+    <TravelListDetailUpdate :travelId="selectedTravelIdForUpdate" @updateList="handleUpdateList"
+      @closeDrawer="closeUpdateForm" />
+  </div>
+
   <!-- CreateView 컴포넌트를 추가하여 updateList 이벤트를 처리 -->
   <CreateView @updateList="handleUpdateList" />
 </template>
@@ -200,5 +228,21 @@ const handleUpdateList = async () => {
 
 .secondary-drawer.open {
   transform: translateX(0);
+}
+
+.edit-form-container {
+  position: fixed;
+  /* 전체 화면의 오른쪽에 고정 */
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+  /* 다른 요소들 위에 표시되도록 설정 */
 }
 </style>
