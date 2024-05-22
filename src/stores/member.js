@@ -70,7 +70,6 @@ export const useMemberStore = defineStore("memberStore", () => {
       (response) => {
         if (response.status === httpStatusCode.OK) {
           userInfo.value = response.data.response;
-          console.log(userInfo.value);
         } else {
           console.log("유저 정보 없음!!!!");
         }
@@ -93,7 +92,7 @@ export const useMemberStore = defineStore("memberStore", () => {
       userInfo.value.id,
       (response) => {
         if (response.status === httpStatusCode.OK) {
-          console.log(`getUserInfo => ${response.data}`);
+          console.log("유정 정보 있음");
         } else {
           console.log("유저 정보 없음!!!!");
         }
