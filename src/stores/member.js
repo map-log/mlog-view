@@ -12,6 +12,7 @@ import {
   userRegister,
   apiDeleteAccount,
   apiModifyUserProfile,
+  passwordResetRequest,
 } from "@/api/user";
 import { httpStatusCode } from "@/util/http-status";
 
@@ -189,9 +190,25 @@ export const useMemberStore = defineStore("memberStore", () => {
           userInfo.value.email = profileData.email;
           userInfo.value.password = profileData.password;
         }
+        ``;
       },
       (error) => {
         console.log("프로필 수정 실패!!!!");
+        console.error(error);
+      }
+    );
+  };
+
+  const findUserPassword = async (userEmail) => {
+    await passwordResetRequest(
+      userEmail,
+      (response) => {
+        if (response.status === httpStatusCode.OK) {
+          console.log("비밀 번호 재설정 전송 완료!!!!:");
+        }
+      },
+      (error) => {
+        console.log("비밀 번호 재설정 전송 실패!!!!:");
         console.error(error);
       }
     );
@@ -210,5 +227,6 @@ export const useMemberStore = defineStore("memberStore", () => {
     tokenRegenerate,
     userLogout,
     getMeInfo,
+    findUserPassword,
   };
 });
