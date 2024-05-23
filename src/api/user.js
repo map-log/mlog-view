@@ -37,6 +37,10 @@ async function apiModifyUserProfile(param, userid, success, fail) {
   await local.put(`/user/${userid}`, param).then(success).catch(fail);
 }
 
+async function passwordResetRequest(userEmail, success, fail) {
+  await local.post(`/user/password-reset-request?email=${userEmail}`).then(success).catch(fail);
+}
+
 export {
   userConfirm,
   findById,
@@ -46,4 +50,5 @@ export {
   userRegister,
   apiDeleteAccount,
   apiModifyUserProfile,
+  passwordResetRequest,
 };

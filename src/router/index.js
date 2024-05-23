@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import LogInView from "@/views/LogInView.vue";
 import UserInfoView from "@/views/UserInfoView.vue";
 import JoinView from "@/views/JoinView.vue";
+import FindPassword from "@/views/FindPassword.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: "/join",
       name: "join",
       component: JoinView,
+    },
+    {
+      path: "/forgot-password",
+      name: "forgotPassword",
+      component: FindPassword, // 새로 추가한 페이지
     },
   ],
 });

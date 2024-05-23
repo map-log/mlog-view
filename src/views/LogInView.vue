@@ -23,8 +23,9 @@
         <a-button :disabled="disabled" type="primary" html-type="submit" @click="login" class="login-form-button">
           Log in
         </a-button>
-        <div class="login-form-link">
-          Or
+        <div class="login-form-links">
+          <a @click="navigateToForgotPassword">Forgot password?</a>
+          <span> Or </span>
           <a @click="navigateToJoin">register now!</a>
         </div>
       </a-form-item>
@@ -80,6 +81,10 @@ const navigateToJoin = () => {
   router.push({ name: 'join' });
 };
 
+const navigateToForgotPassword = () => {
+  router.push({ name: 'forgotPassword' });
+};
+
 </script>
 
 <style scoped>
@@ -98,17 +103,17 @@ const navigateToJoin = () => {
   border-radius: 8px;
 }
 
-.login-form-forgot {
-  float: right;
+.login-form-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.login-form-links a {
+  margin: 0 5px;
 }
 
 .login-form-button {
   width: 100%;
-}
-
-.login-form-link {
-  display: block;
-  text-align: center;
-  margin-top: 20px;
 }
 </style>
