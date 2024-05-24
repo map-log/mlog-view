@@ -13,7 +13,8 @@
       </a-form-item>
 
       <a-form-item>
-        <a-button type="primary" html-type="submit" class="password-reset-form-button" @click="onFinish">
+        <a-button type="primary" html-type="submit" class="password-reset-form-button" :loading="loading"
+          @click="onFinish">
           Send Reset Email
         </a-button>
       </a-form-item>
@@ -41,7 +42,10 @@ const formState = ref({
   email: '',
 });
 
+const loading = ref(false);
+
 const onFinish = async () => {
+  loading.value = true;
   try {
     await memberStore.findUserPassword(formState.value.email);
     message.success('Password reset email sent successfully.', 1);
@@ -49,6 +53,7 @@ const onFinish = async () => {
   } catch (error) {
     console.error('Error sending password reset email:', error);
     message.error('An error occurred while sending the password reset email.', 1);
+    loading.value = false;
   }
 };
 
